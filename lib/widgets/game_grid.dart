@@ -53,55 +53,61 @@ class _GameGridState extends State<GameGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(GameState.maxAttempts, (rowIndex) {
-        final isCurrentRow =
-            rowIndex == widget.gameState.currentRow &&
-            !widget.gameState.isGameOver;
-        final shouldAnimate = rowIndex == _lastCompletedRow;
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(GameState.maxAttempts, (rowIndex) {
+          final isCurrentRow =
+              rowIndex == widget.gameState.currentRow &&
+              !widget.gameState.isGameOver;
+          final shouldAnimate = rowIndex == _lastCompletedRow;
 
-        List<TileState> rowTiles;
-        if (rowIndex < widget.gameState.currentRow) {
-          // Past guesses - show evaluated tiles
-          rowTiles = widget.gameState.guesses[rowIndex];
-        } else if (isCurrentRow) {
-          // Current row being typed
-          rowTiles = _getCurrentRowTiles();
-        } else {
-          // Future rows - empty
-          rowTiles = List.generate(
-            GameState.wordLength,
-            (_) => TileState.empty(),
-          );
-        }
+          List<TileState> rowTiles;
+          if (rowIndex < widget.gameState.currentRow) {
+            // Past guesses - show evaluated tiles
+            rowTiles = widget.gameState.guesses[rowIndex];
+          } else if (isCurrentRow) {
+            // Current row being typed
+            rowTiles = _getCurrentRowTiles();
+          } else {
+            // Future rows - empty
+            rowTiles = List.generate(
+              GameState.wordLength,
+              (_) => TileState.empty(),
+            );
+          }
 
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: AppSizes.gridRowGap / 2),
-          child: ShakeWidget(
-            shake: isCurrentRow && widget.shakeCurrentRow,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(GameState.wordLength, (colIndex) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppSizes.tileGap / 2,
-                  ),
-                  child: WordleTile(
-                    key: ValueKey(
-                      '$rowIndex-$colIndex-${rowTiles[colIndex].letter}',
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSizes.gridRowGap / 2),
+            child: ShakeWidget(
+              shake: isCurrentRow && widget.shakeCurrentRow,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(GameState.wordLength, (colIndex) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSizes.tileGap / 2,
                     ),
-                    tileState: rowTiles[colIndex],
-                    isCurrentRow: isCurrentRow,
-                    index: colIndex,
-                    animate: shouldAnimate,
-                  ),
-                );
-              }),
+                    child: SizedBox(
+                      width: AppSizes.tileSize,
+                      height: AppSizes.tileSize,
+                      child: WordleTile(
+                        key: ValueKey(
+                          '$rowIndex-$colIndex-${rowTiles[colIndex].letter}',
+                        ),
+                        tileState: rowTiles[colIndex],
+                        isCurrentRow: isCurrentRow,
+                        index: colIndex,
+                        animate: shouldAnimate,
+                      ),
+                    ),
+                  );
+                }),
+              ),
             ),
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 }

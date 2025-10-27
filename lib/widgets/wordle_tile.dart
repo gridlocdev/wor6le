@@ -102,10 +102,12 @@ class _WordleTileState extends State<WordleTile>
         : AppColors.textLight;
   }
 
-  Widget _buildArrow() {
+  Widget _buildArrow([double? size]) {
     if (widget.tileState.arrowDirection == ArrowDirection.none) {
       return const SizedBox.shrink();
     }
+
+    final arrowSize = size ?? AppSizes.arrowSize;
 
     return Positioned(
       bottom: AppSizes.arrowPadding,
@@ -120,7 +122,7 @@ class _WordleTileState extends State<WordleTile>
             ? Icons.arrow_back
             : Icons.arrow_forward,
         color: Colors.white.withValues(alpha: 0.8),
-        size: AppSizes.arrowSize,
+        size: arrowSize,
       ),
     );
   }
@@ -138,38 +140,52 @@ class _WordleTileState extends State<WordleTile>
         return Transform(
           transform: transform,
           alignment: Alignment.center,
-          child: Container(
-            width: AppSizes.tileSize,
-            height: AppSizes.tileSize,
-            decoration: BoxDecoration(
-              color: angle > 3.14159 / 2
-                  ? _getBackgroundColor()
-                  : Colors.transparent,
-              border: Border.all(
-                color: _getBorderColor(),
-                width: AppSizes.tileBorderWidth,
-              ),
-              borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
-            ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Transform(
-                    transform: angle > 3.14159 / 2
-                        ? (Matrix4.identity()..rotateX(3.14159))
-                        : Matrix4.identity(),
-                    alignment: Alignment.center,
-                    child: Text(
-                      widget.tileState.letter,
-                      style: AppTextStyles.tileLetter.copyWith(
-                        color: _getTextColor(),
-                      ),
-                    ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Scale font size based on tile size
+              final tileSize = constraints.maxWidth > 0
+                  ? constraints.maxWidth
+                  : AppSizes.tileSize;
+              final fontSize =
+                  (tileSize / AppSizes.tileSize) * AppSizes.tileFontSize;
+              final arrowSize =
+                  (tileSize / AppSizes.tileSize) * AppSizes.arrowSize;
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: angle > 3.14159 / 2
+                      ? _getBackgroundColor()
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: _getBorderColor(),
+                    width: AppSizes.tileBorderWidth,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    AppSizes.tileBorderRadius,
                   ),
                 ),
-                if (angle > 3.14159 / 2) _buildArrow(),
-              ],
-            ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Transform(
+                        transform: angle > 3.14159 / 2
+                            ? (Matrix4.identity()..rotateX(3.14159))
+                            : Matrix4.identity(),
+                        alignment: Alignment.center,
+                        child: Text(
+                          widget.tileState.letter,
+                          style: AppTextStyles.tileLetter.copyWith(
+                            color: _getTextColor(),
+                            fontSize: fontSize,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (angle > 3.14159 / 2) _buildArrow(arrowSize),
+                  ],
+                ),
+              );
+            },
           ),
         );
       },
