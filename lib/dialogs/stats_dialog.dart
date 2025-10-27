@@ -85,12 +85,15 @@ class StatsDialog extends StatelessWidget {
                     color: AppColors.getTextColorForBackground(darkMode),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.close,
-                    color: AppColors.getTextColorForBackground(darkMode),
+                Tooltip(
+                  message: 'Close',
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: AppColors.getTextColorForBackground(darkMode),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
@@ -179,63 +182,73 @@ class StatsDialog extends StatelessWidget {
             }),
             if (gameState != null && gameState!.isGameOver) ...[
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => _shareResults(context),
-                  icon: const Icon(Icons.share),
-                  label: const Text('SHARE'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.getCorrectColor(colorBlindMode),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+              Tooltip(
+                message: 'Copy results to clipboard',
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _shareResults(context),
+                    icon: const Icon(Icons.share),
+                    label: const Text('SHARE'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.getCorrectColor(
+                        colorBlindMode,
+                      ),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
                 ),
               ),
             ],
             if (onReset != null) ...[
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Reset Statistics'),
-                        content: const Text(
-                          'Are you sure you want to reset all statistics? This action cannot be undone.',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Cancel'),
+              Tooltip(
+                message: 'Clear all statistics and start fresh',
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Reset Statistics'),
+                          content: const Text(
+                            'Are you sure you want to reset all statistics? This action cannot be undone.',
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(
-                                context,
-                              ).pop(); // Close confirmation dialog
-                              Navigator.of(context).pop(); // Close stats dialog
-                              onReset!();
-                            },
-                            child: const Text(
-                              'Reset',
-                              style: TextStyle(color: Colors.red),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Cancel'),
                             ),
-                          ),
-                        ],
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(
+                                  context,
+                                ).pop(); // Close confirmation dialog
+                                Navigator.of(
+                                  context,
+                                ).pop(); // Close stats dialog
+                                onReset!();
+                              },
+                              child: const Text(
+                                'Reset',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('RESET STATISTICS'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: darkMode ? Colors.red[300] : Colors.red,
+                      side: BorderSide(
+                        color: darkMode ? Colors.red[300]! : Colors.red,
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('RESET STATISTICS'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: darkMode ? Colors.red[300] : Colors.red,
-                    side: BorderSide(
-                      color: darkMode ? Colors.red[300]! : Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
               ),

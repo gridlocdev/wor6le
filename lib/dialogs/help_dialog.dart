@@ -39,12 +39,15 @@ class HelpDialog extends StatelessWidget {
                       color: AppColors.getTextColorForBackground(darkMode),
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: AppColors.getTextColorForBackground(darkMode),
+                  Tooltip(
+                    message: 'Close',
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: AppColors.getTextColorForBackground(darkMode),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),

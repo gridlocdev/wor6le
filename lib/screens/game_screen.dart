@@ -203,6 +203,7 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 );
               },
+              tooltip: 'How to Play',
             ),
             IconButton(
               icon: Icon(
@@ -226,6 +227,7 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 );
               },
+              tooltip: 'Settings',
             ),
             IconButton(
               icon: Icon(
@@ -250,6 +252,7 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 );
               },
+              tooltip: 'Statistics',
             ),
           ],
         ),

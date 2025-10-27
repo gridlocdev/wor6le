@@ -53,12 +53,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     color: AppColors.getTextColorForBackground(_darkMode),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.close,
-                    color: AppColors.getTextColorForBackground(_darkMode),
+                Tooltip(
+                  message: 'Close',
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: AppColors.getTextColorForBackground(_darkMode),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
