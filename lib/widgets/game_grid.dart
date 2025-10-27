@@ -8,11 +8,15 @@ import 'shake_widget.dart';
 class GameGrid extends StatefulWidget {
   final GameState gameState;
   final bool shakeCurrentRow;
+  final bool colorBlindMode;
+  final bool darkMode;
 
   const GameGrid({
     super.key,
     required this.gameState,
     this.shakeCurrentRow = false,
+    this.colorBlindMode = false,
+    this.darkMode = false,
   });
 
   @override
@@ -123,6 +127,8 @@ class _GameGridState extends State<GameGrid> {
                           isCurrentRow: isCurrentRow,
                           index: colIndex,
                           animate: shouldAnimate,
+                          colorBlindMode: widget.colorBlindMode,
+                          darkMode: widget.darkMode,
                         ),
                       ),
                     );

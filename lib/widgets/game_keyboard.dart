@@ -6,11 +6,15 @@ import '../utils/constants.dart';
 class GameKeyboard extends StatelessWidget {
   final GameController controller;
   final VoidCallback? onInvalidGuess;
+  final bool colorBlindMode;
+  final bool darkMode;
 
   const GameKeyboard({
     super.key,
     required this.controller,
     this.onInvalidGuess,
+    this.colorBlindMode = false,
+    this.darkMode = false,
   });
 
   static const List<List<String>> _keyboardLayout = [
@@ -21,30 +25,30 @@ class GameKeyboard extends StatelessWidget {
 
   Color _getKeyColor(String key, BuildContext context) {
     if (key == 'ENTER' || key == '⌫') {
-      return AppColors.keyBackground;
+      return AppColors.getKeyBackgroundColor(darkMode);
     }
 
     final status = controller.getKeyStatus(key);
     switch (status) {
       case LetterStatus.correct:
-        return AppColors.correct;
+        return AppColors.getCorrectColor(colorBlindMode);
       case LetterStatus.present:
-        return AppColors.present;
+        return AppColors.getPresentColor(colorBlindMode);
       case LetterStatus.absent:
-        return AppColors.absent;
+        return AppColors.getAbsentColor(colorBlindMode);
       case LetterStatus.empty:
-        return AppColors.keyBackground;
+        return AppColors.getKeyBackgroundColor(darkMode);
     }
   }
 
   Color _getKeyTextColor(String key) {
     if (key == 'ENTER' || key == '⌫') {
-      return AppColors.textDark;
+      return AppColors.getTextColorForBackground(darkMode);
     }
 
     final status = controller.getKeyStatus(key);
     return status == LetterStatus.empty
-        ? AppColors.textDark
+        ? AppColors.getTextColorForBackground(darkMode)
         : AppColors.textLight;
   }
 

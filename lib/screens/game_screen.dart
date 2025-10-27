@@ -177,15 +177,23 @@ class _GameScreenState extends State<GameScreen> {
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.getBackgroundColor(_darkMode),
         appBar: AppBar(
-          backgroundColor: AppColors.appBarBackground,
+          backgroundColor: AppColors.getAppBarBackgroundColor(_darkMode),
           elevation: 0,
-          title: const Text('WOR6LE', style: AppTextStyles.title),
+          title: Text(
+            'WOR6LE',
+            style: AppTextStyles.title.copyWith(
+              color: AppColors.getTextColorForBackground(_darkMode),
+            ),
+          ),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: Icon(Icons.help_outline, color: AppColors.textDark),
+              icon: Icon(
+                Icons.help_outline,
+                color: AppColors.getTextColorForBackground(_darkMode),
+              ),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -194,7 +202,10 @@ class _GameScreenState extends State<GameScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.settings_outlined, color: AppColors.textDark),
+              icon: Icon(
+                Icons.settings_outlined,
+                color: AppColors.getTextColorForBackground(_darkMode),
+              ),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -214,7 +225,10 @@ class _GameScreenState extends State<GameScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.bar_chart, color: AppColors.textDark),
+              icon: Icon(
+                Icons.bar_chart,
+                color: AppColors.getTextColorForBackground(_darkMode),
+              ),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -238,11 +252,15 @@ class _GameScreenState extends State<GameScreen> {
                     child: GameGrid(
                       gameState: _controller.gameState,
                       shakeCurrentRow: _shakeRow,
+                      colorBlindMode: _colorBlindMode,
+                      darkMode: _darkMode,
                     ),
                   ),
                 ),
                 GameKeyboard(
                   controller: _controller,
+                  colorBlindMode: _colorBlindMode,
+                  darkMode: _darkMode,
                   onInvalidGuess: () {
                     setState(() => _shakeRow = true);
                     Future.delayed(const Duration(milliseconds: 500), () {

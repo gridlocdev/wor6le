@@ -9,6 +9,8 @@ class WordleTile extends StatefulWidget {
   final bool isCurrentRow;
   final int index;
   final bool animate;
+  final bool colorBlindMode;
+  final bool darkMode;
 
   const WordleTile({
     super.key,
@@ -16,6 +18,8 @@ class WordleTile extends StatefulWidget {
     this.isCurrentRow = false,
     this.index = 0,
     this.animate = false,
+    this.colorBlindMode = false,
+    this.darkMode = false,
   });
 
   @override
@@ -77,11 +81,11 @@ class _WordleTileState extends State<WordleTile>
   Color _getBackgroundColor() {
     switch (widget.tileState.status) {
       case LetterStatus.correct:
-        return AppColors.correct;
+        return AppColors.getCorrectColor(widget.colorBlindMode);
       case LetterStatus.present:
-        return AppColors.present;
+        return AppColors.getPresentColor(widget.colorBlindMode);
       case LetterStatus.absent:
-        return AppColors.absent;
+        return AppColors.getAbsentColor(widget.colorBlindMode);
       case LetterStatus.empty:
         return Colors.transparent;
     }
@@ -92,13 +96,13 @@ class _WordleTileState extends State<WordleTile>
       return Colors.transparent;
     }
     return widget.isCurrentRow && widget.tileState.letter.isNotEmpty
-        ? AppColors.filledBorder
-        : AppColors.emptyBorder;
+        ? AppColors.getFilledBorderColor(widget.darkMode)
+        : AppColors.getEmptyBorderColor(widget.darkMode);
   }
 
   Color _getTextColor() {
     return widget.tileState.status == LetterStatus.empty
-        ? AppColors.textDark
+        ? AppColors.getTextColorForBackground(widget.darkMode)
         : AppColors.textLight;
   }
 
