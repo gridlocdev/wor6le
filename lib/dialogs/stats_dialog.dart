@@ -9,6 +9,7 @@ class StatsDialog extends StatelessWidget {
   final GameState? gameState;
   final bool colorBlindMode;
   final bool darkMode;
+  final VoidCallback? onReset;
 
   const StatsDialog({
     super.key,
@@ -16,6 +17,7 @@ class StatsDialog extends StatelessWidget {
     this.gameState,
     this.colorBlindMode = false,
     this.darkMode = false,
+    this.onReset,
   });
 
   String _generateShareText() {
@@ -98,7 +100,7 @@ class StatsDialog extends StatelessWidget {
               children: [
                 _buildStatItem(statistics.gamesPlayed.toString(), 'Played'),
                 _buildStatItem(
-                  statistics.winPercentage.toStringAsFixed(0),
+                  '${statistics.winPercentage.toStringAsFixed(0)}%',
                   'Win %',
                 ),
                 _buildStatItem(
@@ -186,6 +188,53 @@ class StatsDialog extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.getCorrectColor(colorBlindMode),
                     foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+            if (onReset != null) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Reset Statistics'),
+                        content: const Text(
+                          'Are you sure you want to reset all statistics? This action cannot be undone.',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(
+                                context,
+                              ).pop(); // Close confirmation dialog
+                              Navigator.of(context).pop(); // Close stats dialog
+                              onReset!();
+                            },
+                            child: const Text(
+                              'Reset',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('RESET STATISTICS'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: darkMode ? Colors.red[300] : Colors.red,
+                    side: BorderSide(
+                      color: darkMode ? Colors.red[300]! : Colors.red,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),

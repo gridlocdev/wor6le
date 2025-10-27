@@ -8,8 +8,8 @@ import '../dialogs/settings_dialog.dart';
 import '../dialogs/stats_dialog.dart';
 import '../services/storage_service.dart';
 import '../models/game_statistics.dart';
+import '../models/game_status.dart';
 import '../utils/constants.dart';
-import 'package:intl/intl.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -44,16 +44,8 @@ class _GameScreenState extends State<GameScreen> {
     // Load statistics
     _statistics = await _storage.loadStatistics();
 
-    // Check if new day
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final lastPlayed = await _storage.getLastPlayedDate();
-
-    if (lastPlayed != today) {
-      _controller.initializeNewGame();
-      await _storage.setLastPlayedDate(today);
-    } else {
-      _controller.initializeNewGame();
-    }
+    // Initialize a new game
+    _controller.initializeNewGame();
 
     setState(() {});
   }
@@ -104,21 +96,12 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _handleGameOver() async {
-    final isWin = _controller.gameState.status.toString().contains('won');
+    final isWin = _controller.gameState.status == GameStatus.won;
 
     // Update statistics
-    final lastPlayed = await _storage.getLastPlayedDate();
-    final continuedStreak =
-        lastPlayed != null &&
-        _isSameDay(
-          DateTime.parse(lastPlayed).add(const Duration(days: 1)),
-          DateTime.now(),
-        );
-
     await _storage.updateStatisticsAfterGame(
       won: isWin,
       attempts: _controller.gameState.currentRow,
-      continuedStreak: continuedStreak,
     );
 
     // Reload statistics
@@ -127,12 +110,8 @@ class _GameScreenState extends State<GameScreen> {
     _showGameOverDialog();
   }
 
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
   void _showGameOverDialog() {
-    final isWin = _controller.gameState.status.toString().contains('won');
+    final isWin = _controller.gameState.status == GameStatus.won;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -153,6 +132,13 @@ class _GameScreenState extends State<GameScreen> {
                   gameState: _controller.gameState,
                   colorBlindMode: _colorBlindMode,
                   darkMode: _darkMode,
+                  onReset: () async {
+                    await _storage.resetStatistics();
+                    final newStats = await _storage.loadStatistics();
+                    setState(() {
+                      _statistics = newStats;
+                    });
+                  },
                 ),
               );
             },
@@ -183,6 +169,18 @@ class _GameScreenState extends State<GameScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.getAppBarBackgroundColor(_darkMode),
           elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.refresh,
+              color: AppColors.getTextColorForBackground(_darkMode),
+            ),
+            onPressed: () {
+              setState(() {
+                _controller.initializeNewGame();
+              });
+            },
+            tooltip: 'New Game',
+          ),
           title: Text(
             'WOR6LE',
             style: AppTextStyles.title.copyWith(
@@ -242,6 +240,13 @@ class _GameScreenState extends State<GameScreen> {
                     gameState: _controller.gameState,
                     colorBlindMode: _colorBlindMode,
                     darkMode: _darkMode,
+                    onReset: () async {
+                      await _storage.resetStatistics();
+                      final newStats = await _storage.loadStatistics();
+                      setState(() {
+                        _statistics = newStats;
+                      });
+                    },
                   ),
                 );
               },

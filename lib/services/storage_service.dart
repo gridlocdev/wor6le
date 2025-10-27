@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/game_statistics.dart';
 
@@ -12,15 +13,21 @@ class StorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final statsJson = prefs.getString(_statsKey);
-      
+
       if (statsJson != null) {
+        debugPrint('Loading statistics: $statsJson');
         final Map<String, dynamic> decoded = jsonDecode(statsJson);
-        return GameStatistics.fromJson(decoded);
+        final stats = GameStatistics.fromJson(decoded);
+        debugPrint(
+          'Loaded stats - Games: ${stats.gamesPlayed}, Wins: ${stats.gamesWon}, Streak: ${stats.currentStreak}/${stats.maxStreak}',
+        );
+        return stats;
       }
     } catch (e) {
+      debugPrint('Error loading statistics: $e');
       // Return default statistics on error
     }
-    
+
     return const GameStatistics();
   }
 
@@ -28,8 +35,11 @@ class StorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final statsJson = jsonEncode(statistics.toJson());
+      debugPrint('Saving statistics: $statsJson');
       await prefs.setString(_statsKey, statsJson);
+      debugPrint('Statistics saved successfully');
     } catch (e) {
+      debugPrint('Error saving statistics: $e');
       // Handle error silently
     }
   }
@@ -91,24 +101,37 @@ class StorageService {
   Future<void> updateStatisticsAfterGame({
     required bool won,
     required int attempts,
-    required bool continuedStreak,
   }) async {
+    debugPrint('=== Updating statistics after game ===');
+    debugPrint('Won: $won, Attempts: $attempts');
+
     final stats = await loadStatistics();
-    
+    debugPrint(
+      'Current stats before update - Games: ${stats.gamesPlayed}, Wins: ${stats.gamesWon}, Streak: ${stats.currentStreak}/${stats.maxStreak}',
+    );
+
+    // Increment games played counter
     final newGamesPlayed = stats.gamesPlayed + 1;
+
+    // Increment wins counter if game was won
     final newGamesWon = won ? stats.gamesWon + 1 : stats.gamesWon;
-    final newCurrentStreak = continuedStreak
-        ? (won ? stats.currentStreak + 1 : 0)
-        : 0;
+
+    // Streak logic based on consecutive wins:
+    // - If won: increment current streak by 1
+    // - If lost: reset current streak to 0
+    final newCurrentStreak = won ? stats.currentStreak + 1 : 0;
+
+    // Update max streak if current streak exceeds it
     final newMaxStreak = newCurrentStreak > stats.maxStreak
         ? newCurrentStreak
         : stats.maxStreak;
-    
+
+    // Update guess distribution (only for wins)
     final newDistribution = Map<int, int>.from(stats.guessDistribution);
     if (won) {
       newDistribution[attempts] = (newDistribution[attempts] ?? 0) + 1;
     }
-    
+
     final newStats = GameStatistics(
       gamesPlayed: newGamesPlayed,
       gamesWon: newGamesWon,
@@ -116,7 +139,15 @@ class StorageService {
       maxStreak: newMaxStreak,
       guessDistribution: newDistribution,
     );
-    
+
+    debugPrint(
+      'New stats after update - Games: ${newStats.gamesPlayed}, Wins: ${newStats.gamesWon}, Streak: ${newStats.currentStreak}/${newStats.maxStreak}',
+    );
     await saveStatistics(newStats);
+    debugPrint('=== Statistics update complete ===');
+  }
+
+  Future<void> resetStatistics() async {
+    await saveStatistics(const GameStatistics());
   }
 }

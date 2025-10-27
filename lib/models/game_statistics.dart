@@ -34,22 +34,41 @@ class GameStatistics {
   }
 
   Map<String, dynamic> toJson() {
+    // Convert guessDistribution int keys to strings for JSON compatibility
+    final Map<String, int> stringKeyDistribution = {};
+    guessDistribution.forEach((key, value) {
+      stringKeyDistribution[key.toString()] = value;
+    });
+
     return {
       'gamesPlayed': gamesPlayed,
       'gamesWon': gamesWon,
       'currentStreak': currentStreak,
       'maxStreak': maxStreak,
-      'guessDistribution': guessDistribution,
+      'guessDistribution': stringKeyDistribution,
     };
   }
 
   factory GameStatistics.fromJson(Map<String, dynamic> json) {
+    // Handle guessDistribution conversion carefully
+    // JSON converts int keys to strings, so we need to convert them back
+    final Map<int, int> distribution = {};
+    final rawDistribution = json['guessDistribution'];
+    if (rawDistribution != null && rawDistribution is Map) {
+      rawDistribution.forEach((key, value) {
+        final intKey = key is int ? key : int.tryParse(key.toString());
+        if (intKey != null && value is int) {
+          distribution[intKey] = value;
+        }
+      });
+    }
+
     return GameStatistics(
       gamesPlayed: json['gamesPlayed'] ?? 0,
       gamesWon: json['gamesWon'] ?? 0,
       currentStreak: json['currentStreak'] ?? 0,
       maxStreak: json['maxStreak'] ?? 0,
-      guessDistribution: Map<int, int>.from(json['guessDistribution'] ?? {}),
+      guessDistribution: distribution,
     );
   }
 }
