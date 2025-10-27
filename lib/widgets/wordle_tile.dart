@@ -137,6 +137,12 @@ class _WordleTileState extends State<WordleTile>
           ..setEntry(3, 2, 0.001)
           ..rotateX(angle);
 
+        // Show colored state immediately if not animating and has a status
+        final shouldShowColor =
+            !widget.animate && widget.tileState.status != LetterStatus.empty
+            ? true
+            : angle > 3.14159 / 2;
+
         return Transform(
           transform: transform,
           alignment: Alignment.center,
@@ -153,7 +159,7 @@ class _WordleTileState extends State<WordleTile>
 
               return Container(
                 decoration: BoxDecoration(
-                  color: angle > 3.14159 / 2
+                  color: shouldShowColor
                       ? _getBackgroundColor()
                       : Colors.transparent,
                   border: Border.all(
@@ -181,7 +187,7 @@ class _WordleTileState extends State<WordleTile>
                         ),
                       ),
                     ),
-                    if (angle > 3.14159 / 2) _buildArrow(arrowSize),
+                    if (shouldShowColor) _buildArrow(arrowSize),
                   ],
                 ),
               );
