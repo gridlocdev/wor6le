@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'dart:math';
 import '../models/game_state.dart';
 import '../models/tile_state.dart';
 import '../models/letter_status.dart';
@@ -10,6 +11,7 @@ class GameController extends ChangeNotifier {
   GameState _gameState;
   List<String> _validWords = [];
   List<String> _answerWords = [];
+  final Random _random = Random();
 
   GameController(String targetWord)
     : _gameState = GameState.initial(targetWord);
@@ -55,11 +57,19 @@ class GameController extends ChangeNotifier {
     return _answerWords[index];
   }
 
-  /// Initialize a new game with today's word
+  /// Get a random word for a new game
+  String getRandomWord() {
+    if (_answerWords.isEmpty) {
+      return 'FLUTTER'; // Fallback
+    }
+    final index = _random.nextInt(_answerWords.length);
+    return _answerWords[index];
+  }
+
+  /// Initialize a new game with a random word
   void initializeNewGame() {
-    final today = DateTime.now();
-    final dailyWord = getDailyWord(today);
-    _gameState = GameState.initial(dailyWord);
+    final randomWord = getRandomWord();
+    _gameState = GameState.initial(randomWord);
     notifyListeners();
   }
 
