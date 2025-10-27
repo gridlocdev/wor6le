@@ -7,7 +7,8 @@
 1. ✅ **Dependencies & Word List**
    - Added `shared_preferences` for persistence
    - Added `intl` for date formatting
-   - Created `assets/words.txt` with 600+ 6-letter words
+   - Created `assets/answers.txt` with curated answer words
+   - Created `assets/guesses.txt` with comprehensive valid guess words
 
 2. ✅ **Data Models**
    - `LetterStatus` enum (correct/present/absent/empty)
@@ -166,7 +167,8 @@ Works on:
 - `utils/constants.dart` - Design system
 
 ### Assets & Tests
-- `assets/words.txt` - 600+ 6-letter words
+- `assets/answers.txt` - Curated answer words for daily puzzles
+- `assets/guesses.txt` - Valid guess words dictionary
 - `test/game_controller_test.dart` - Unit tests
 
 ### Documentation
@@ -179,6 +181,65 @@ Works on:
 - **Extensible**: Easy to add new features
 - **Performant**: Optimized animations and state management
 - **User-friendly**: Intuitive UI with helpful feedback
+
+---
+
+## 📋 Word List Refactoring
+
+### Summary
+Refactored the word list system to use two separate files for better game design:
+- `answers.txt` - Curated list of words used as daily puzzle answers
+- `guesses.txt` - Comprehensive list of valid words that players can guess
+
+### Changes Made
+
+#### 1. Asset Files
+**Previous:** Single `assets/words.txt` file
+
+**New:** 
+- `assets/answers.txt` - ~900 curated 6-letter answer words
+- `assets/guesses.txt` - ~3000 valid 6-letter guess words
+
+#### 2. Code Changes
+
+**`lib/controllers/game_controller.dart`**
+- Changed `_targetWords` to `_answerWords` for clarity
+- Modified `loadWords()` to load both files:
+  - `_validWords` loaded from `guesses.txt` (for validation)
+  - `_answerWords` loaded from `answers.txt` (for daily word selection)
+- Updated `getDailyWord()` to use `_answerWords` instead of `_targetWords`
+
+**`pubspec.yaml`**
+Updated assets section:
+```yaml
+assets:
+  - assets/answers.txt
+  - assets/guesses.txt
+```
+
+**Documentation Updates**
+- Updated `README.md` to reflect new asset structure
+- Updated `IMPLEMENTATION.md` to document the two-file system
+
+### Benefits
+
+1. **Better Game Balance**: Answer words are curated to be common, fair words
+2. **Larger Valid Dictionary**: Players can guess from a much wider vocabulary
+3. **Flexibility**: Easy to adjust answer difficulty without affecting valid guesses
+4. **Matches Original Wordle**: This approach mirrors the New York Times Wordle design
+
+### Testing
+
+- Code compiles without errors (`flutter analyze` passes)
+- No new linting issues introduced
+- Existing test failures are pre-existing and unrelated to this refactoring
+
+### How It Works
+
+1. When the game starts, both word lists are loaded into memory
+2. Daily word is selected randomly from `_answerWords` based on date
+3. When player submits a guess, it's validated against `_validWords`
+4. This allows obscure words to be valid guesses while keeping answers fair
 
 ---
 

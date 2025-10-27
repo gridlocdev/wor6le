@@ -9,7 +9,7 @@ import '../models/game_status.dart';
 class GameController extends ChangeNotifier {
   GameState _gameState;
   List<String> _validWords = [];
-  List<String> _targetWords = [];
+  List<String> _answerWords = [];
 
   GameController(String targetWord)
     : _gameState = GameState.initial(targetWord);
@@ -19,17 +19,25 @@ class GameController extends ChangeNotifier {
   /// Load word lists from assets
   Future<void> loadWords() async {
     try {
-      final String wordsString = await rootBundle.loadString(
-        'assets/words.txt',
+      // Load valid guess words
+      final String guessesString = await rootBundle.loadString(
+        'assets/guesses.txt',
       );
-      final List<String> words = wordsString
+      _validWords = guessesString
           .split('\n')
           .map((word) => word.trim().toUpperCase())
           .where((word) => word.length == 6)
           .toList();
 
-      _validWords = words;
-      _targetWords = words;
+      // Load answer words (subset used for daily puzzles)
+      final String answersString = await rootBundle.loadString(
+        'assets/answers.txt',
+      );
+      _answerWords = answersString
+          .split('\n')
+          .map((word) => word.trim().toUpperCase())
+          .where((word) => word.length == 6)
+          .toList();
     } catch (e) {
       debugPrint('Error loading words: $e');
     }
@@ -37,14 +45,14 @@ class GameController extends ChangeNotifier {
 
   /// Get daily word based on date
   String getDailyWord(DateTime date) {
-    if (_targetWords.isEmpty) {
+    if (_answerWords.isEmpty) {
       return 'FLUTTER'; // Fallback
     }
 
     // Use date as seed for deterministic random selection
     final daysSinceEpoch = date.difference(DateTime(2025, 1, 1)).inDays;
-    final index = daysSinceEpoch % _targetWords.length;
-    return _targetWords[index];
+    final index = daysSinceEpoch % _answerWords.length;
+    return _answerWords[index];
   }
 
   /// Initialize a new game with today's word

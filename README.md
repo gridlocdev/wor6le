@@ -59,7 +59,8 @@ lib/
 ├── utils/
 │   └── constants.dart           # Colors, sizes, styles
 └── assets/
-    └── words.txt                # 6-letter word dictionary
+    ├── answers.txt              # Curated list of answer words
+    └── guesses.txt              # Valid guess words dictionary
 ```
 
 ### Key Components
