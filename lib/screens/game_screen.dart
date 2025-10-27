@@ -241,7 +241,15 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                 ),
-                GameKeyboard(controller: _controller),
+                GameKeyboard(
+                  controller: _controller,
+                  onInvalidGuess: () {
+                    setState(() => _shakeRow = true);
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (mounted) setState(() => _shakeRow = false);
+                    });
+                  },
+                ),
                 SizedBox(height: AppSizes.screenPadding),
               ],
             );

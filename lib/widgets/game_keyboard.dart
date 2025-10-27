@@ -5,8 +5,13 @@ import '../utils/constants.dart';
 
 class GameKeyboard extends StatelessWidget {
   final GameController controller;
+  final VoidCallback? onInvalidGuess;
 
-  const GameKeyboard({super.key, required this.controller});
+  const GameKeyboard({
+    super.key,
+    required this.controller,
+    this.onInvalidGuess,
+  });
 
   static const List<List<String>> _keyboardLayout = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -43,9 +48,19 @@ class GameKeyboard extends StatelessWidget {
         : AppColors.textLight;
   }
 
-  void _handleKeyPress(String key) {
+  void _handleKeyPress(String key, BuildContext context) async {
     if (key == 'ENTER') {
-      controller.submitGuess();
+      final error = await controller.submitGuess();
+      if (error != null && context.mounted) {
+        onInvalidGuess?.call();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            duration: const Duration(milliseconds: 800),
+            backgroundColor: Colors.black87,
+          ),
+        );
+      }
     } else if (key == '⌫') {
       controller.removeLetter();
     } else {
@@ -62,7 +77,7 @@ class GameKeyboard extends StatelessWidget {
         color: _getKeyColor(key, context),
         borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
         child: InkWell(
-          onTap: () => _handleKeyPress(key),
+          onTap: () => _handleKeyPress(key, context),
           borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
           child: Container(
             width: isWide ? AppSizes.keyWideWidth : AppSizes.keyWidth,
