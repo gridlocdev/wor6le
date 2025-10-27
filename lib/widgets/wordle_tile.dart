@@ -2,87 +2,177 @@ import 'package:flutter/material.dart';
 import '../models/tile_state.dart';
 import '../models/letter_status.dart';
 import '../models/arrow_direction.dart';
+import '../utils/constants.dart';
 
-class WordleTile extends StatelessWidget {
+class WordleTile extends StatefulWidget {
   final TileState tileState;
   final bool isCurrentRow;
+  final int index;
+  final bool animate;
 
   const WordleTile({
     super.key,
     required this.tileState,
     this.isCurrentRow = false,
+    this.index = 0,
+    this.animate = false,
   });
 
+  @override
+  State<WordleTile> createState() => _WordleTileState();
+}
+
+class _WordleTileState extends State<WordleTile>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _flipAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _flipAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    if (widget.animate && widget.tileState.status != LetterStatus.empty) {
+      Future.delayed(Duration(milliseconds: widget.index * 100), () {
+        if (mounted) _controller.forward();
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(WordleTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.animate &&
+        widget.tileState.status != LetterStatus.empty &&
+        oldWidget.tileState.status == LetterStatus.empty) {
+      Future.delayed(Duration(milliseconds: widget.index * 100), () {
+        if (mounted) _controller.forward();
+      });
+    }
+
+    // Pop animation for new letter
+    if (!widget.animate &&
+        widget.isCurrentRow &&
+        widget.tileState.letter.isNotEmpty &&
+        oldWidget.tileState.letter.isEmpty) {
+      _controller.reset();
+      _controller.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Color _getBackgroundColor() {
-    switch (tileState.status) {
+    switch (widget.tileState.status) {
       case LetterStatus.correct:
-        return const Color(0xFF6AAA64); // Green
+        return AppColors.correct;
       case LetterStatus.present:
-        return const Color(0xFFC9B458); // Yellow
+        return AppColors.present;
       case LetterStatus.absent:
-        return const Color(0xFF787C7E); // Gray
+        return AppColors.absent;
       case LetterStatus.empty:
         return Colors.transparent;
     }
   }
 
   Color _getBorderColor() {
-    if (tileState.status != LetterStatus.empty) {
+    if (widget.tileState.status != LetterStatus.empty) {
       return Colors.transparent;
     }
-    return isCurrentRow && tileState.letter.isNotEmpty
-        ? const Color(0xFF878A8C)
-        : const Color(0xFFD3D6DA);
+    return widget.isCurrentRow && widget.tileState.letter.isNotEmpty
+        ? AppColors.filledBorder
+        : AppColors.emptyBorder;
   }
 
   Color _getTextColor() {
-    return tileState.status == LetterStatus.empty ? Colors.black : Colors.white;
+    return widget.tileState.status == LetterStatus.empty
+        ? AppColors.textDark
+        : AppColors.textLight;
   }
 
   Widget _buildArrow() {
-    if (tileState.arrowDirection == ArrowDirection.none) {
+    if (widget.tileState.arrowDirection == ArrowDirection.none) {
       return const SizedBox.shrink();
     }
 
     return Positioned(
-      bottom: 2,
-      right: tileState.arrowDirection == ArrowDirection.right ? 2 : null,
-      left: tileState.arrowDirection == ArrowDirection.left ? 2 : null,
+      bottom: AppSizes.arrowPadding,
+      right: widget.tileState.arrowDirection == ArrowDirection.right
+          ? AppSizes.arrowPadding
+          : null,
+      left: widget.tileState.arrowDirection == ArrowDirection.left
+          ? AppSizes.arrowPadding
+          : null,
       child: Icon(
-        tileState.arrowDirection == ArrowDirection.left
+        widget.tileState.arrowDirection == ArrowDirection.left
             ? Icons.arrow_back
             : Icons.arrow_forward,
-        color: Colors.white.withOpacity(0.8),
-        size: 16,
+        color: Colors.white.withValues(alpha: 0.8),
+        size: AppSizes.arrowSize,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 62,
-      height: 62,
-      decoration: BoxDecoration(
-        color: _getBackgroundColor(),
-        border: Border.all(color: _getBorderColor(), width: 2),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Stack(
-        children: [
-          Center(
-            child: Text(
-              tileState.letter,
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: _getTextColor(),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final angle = _flipAnimation.value * 3.14159;
+        final transform = Matrix4.identity()
+          ..setEntry(3, 2, 0.001)
+          ..rotateX(angle);
+
+        return Transform(
+          transform: transform,
+          alignment: Alignment.center,
+          child: Container(
+            width: AppSizes.tileSize,
+            height: AppSizes.tileSize,
+            decoration: BoxDecoration(
+              color: angle > 3.14159 / 2
+                  ? _getBackgroundColor()
+                  : Colors.transparent,
+              border: Border.all(
+                color: _getBorderColor(),
+                width: AppSizes.tileBorderWidth,
               ),
+              borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
+            ),
+            child: Stack(
+              children: [
+                Center(
+                  child: Transform(
+                    transform: angle > 3.14159 / 2
+                        ? (Matrix4.identity()..rotateX(3.14159))
+                        : Matrix4.identity(),
+                    alignment: Alignment.center,
+                    child: Text(
+                      widget.tileState.letter,
+                      style: AppTextStyles.tileLetter.copyWith(
+                        color: _getTextColor(),
+                      ),
+                    ),
+                  ),
+                ),
+                if (angle > 3.14159 / 2) _buildArrow(),
+              ],
             ),
           ),
-          _buildArrow(),
-        ],
-      ),
+        );
+      },
     );
   }
 }

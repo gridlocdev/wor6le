@@ -8,6 +8,7 @@ import '../dialogs/settings_dialog.dart';
 import '../dialogs/stats_dialog.dart';
 import '../services/storage_service.dart';
 import '../models/game_statistics.dart';
+import '../utils/constants.dart';
 import 'package:intl/intl.dart';
 
 class GameScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _GameScreenState extends State<GameScreen> {
   GameStatistics _statistics = const GameStatistics();
   bool _colorBlindMode = false;
   bool _darkMode = false;
+  bool _shakeRow = false;
 
   @override
   void initState() {
@@ -34,25 +36,25 @@ class _GameScreenState extends State<GameScreen> {
 
   Future<void> _initializeGame() async {
     await _controller.loadWords();
-    
+
     // Load settings
     _colorBlindMode = await _storage.getColorBlindMode();
     _darkMode = await _storage.getDarkMode();
-    
+
     // Load statistics
     _statistics = await _storage.loadStatistics();
-    
+
     // Check if new day
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final lastPlayed = await _storage.getLastPlayedDate();
-    
+
     if (lastPlayed != today) {
       _controller.initializeNewGame();
       await _storage.setLastPlayedDate(today);
     } else {
       _controller.initializeNewGame();
     }
-    
+
     setState(() {});
   }
 
@@ -70,8 +72,8 @@ class _GameScreenState extends State<GameScreen> {
 
     if (key == LogicalKeyboardKey.enter) {
       _submitGuess();
-    } else if (key == LogicalKeyboardKey.backspace || 
-               key == LogicalKeyboardKey.delete) {
+    } else if (key == LogicalKeyboardKey.backspace ||
+        key == LogicalKeyboardKey.delete) {
       _controller.removeLetter();
     } else if (key.keyLabel.length == 1) {
       final char = key.keyLabel.toUpperCase();
@@ -84,10 +86,15 @@ class _GameScreenState extends State<GameScreen> {
   Future<void> _submitGuess() async {
     final error = await _controller.submitGuess();
     if (error != null && mounted) {
+      setState(() => _shakeRow = true);
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) setState(() => _shakeRow = false);
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error),
-          duration: const Duration(seconds: 1),
+          duration: const Duration(milliseconds: 800),
           backgroundColor: Colors.black87,
         ),
       );
@@ -98,22 +105,25 @@ class _GameScreenState extends State<GameScreen> {
 
   Future<void> _handleGameOver() async {
     final isWin = _controller.gameState.status.toString().contains('won');
-    
+
     // Update statistics
     final lastPlayed = await _storage.getLastPlayedDate();
-    final continuedStreak = lastPlayed != null &&
-        _isSameDay(DateTime.parse(lastPlayed).add(const Duration(days: 1)), 
-                   DateTime.now());
-    
+    final continuedStreak =
+        lastPlayed != null &&
+        _isSameDay(
+          DateTime.parse(lastPlayed).add(const Duration(days: 1)),
+          DateTime.now(),
+        );
+
     await _storage.updateStatisticsAfterGame(
       won: isWin,
       attempts: _controller.gameState.currentRow,
       continuedStreak: continuedStreak,
     );
-    
+
     // Reload statistics
     _statistics = await _storage.loadStatistics();
-    
+
     _showGameOverDialog();
   }
 
@@ -169,21 +179,13 @@ class _GameScreenState extends State<GameScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.appBarBackground,
           elevation: 0,
-          title: const Text(
-            'WOR6LE',
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              letterSpacing: 2,
-            ),
-          ),
+          title: const Text('WOR6LE', style: AppTextStyles.title),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.help_outline, color: Colors.black),
+              icon: Icon(Icons.help_outline, color: AppColors.textDark),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -192,7 +194,7 @@ class _GameScreenState extends State<GameScreen> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.settings_outlined, color: Colors.black),
+              icon: Icon(Icons.settings_outlined, color: AppColors.textDark),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -212,7 +214,7 @@ class _GameScreenState extends State<GameScreen> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.bar_chart, color: Colors.black),
+              icon: Icon(Icons.bar_chart, color: AppColors.textDark),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -230,14 +232,17 @@ class _GameScreenState extends State<GameScreen> {
           builder: (context, _) {
             return Column(
               children: [
-                const SizedBox(height: 20),
+                SizedBox(height: AppSizes.screenPadding),
                 Expanded(
                   child: Center(
-                    child: GameGrid(gameState: _controller.gameState),
+                    child: GameGrid(
+                      gameState: _controller.gameState,
+                      shakeCurrentRow: _shakeRow,
+                    ),
                   ),
                 ),
                 GameKeyboard(controller: _controller),
-                const SizedBox(height: 20),
+                SizedBox(height: AppSizes.screenPadding),
               ],
             );
           },

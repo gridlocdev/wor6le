@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/letter_status.dart';
 import '../controllers/game_controller.dart';
+import '../utils/constants.dart';
 
 class GameKeyboard extends StatelessWidget {
   final GameController controller;
@@ -15,29 +16,31 @@ class GameKeyboard extends StatelessWidget {
 
   Color _getKeyColor(String key, BuildContext context) {
     if (key == 'ENTER' || key == '⌫') {
-      return const Color(0xFFD3D6DA);
+      return AppColors.keyBackground;
     }
 
     final status = controller.getKeyStatus(key);
     switch (status) {
       case LetterStatus.correct:
-        return const Color(0xFF6AAA64); // Green
+        return AppColors.correct;
       case LetterStatus.present:
-        return const Color(0xFFC9B458); // Yellow
+        return AppColors.present;
       case LetterStatus.absent:
-        return const Color(0xFF787C7E); // Gray
+        return AppColors.absent;
       case LetterStatus.empty:
-        return const Color(0xFFD3D6DA); // Light gray
+        return AppColors.keyBackground;
     }
   }
 
   Color _getKeyTextColor(String key) {
     if (key == 'ENTER' || key == '⌫') {
-      return Colors.black;
+      return AppColors.textDark;
     }
 
     final status = controller.getKeyStatus(key);
-    return status == LetterStatus.empty ? Colors.black : Colors.white;
+    return status == LetterStatus.empty
+        ? AppColors.textDark
+        : AppColors.textLight;
   }
 
   void _handleKeyPress(String key) {
@@ -54,22 +57,23 @@ class GameKeyboard extends StatelessWidget {
     final isWide = key == 'ENTER' || key == '⌫';
 
     return Padding(
-      padding: const EdgeInsets.all(2.0),
+      padding: EdgeInsets.all(AppSizes.keyGap / 2),
       child: Material(
         color: _getKeyColor(key, context),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
         child: InkWell(
           onTap: () => _handleKeyPress(key),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
           child: Container(
-            width: isWide ? 65 : 43,
-            height: 58,
+            width: isWide ? AppSizes.keyWideWidth : AppSizes.keyWidth,
+            height: AppSizes.keyHeight,
             alignment: Alignment.center,
             child: Text(
               key,
-              style: TextStyle(
-                fontSize: key == 'ENTER' ? 12 : 18,
-                fontWeight: FontWeight.bold,
+              style: AppTextStyles.keyLetter.copyWith(
+                fontSize: key == 'ENTER'
+                    ? AppSizes.keyEnterFontSize
+                    : AppSizes.keyFontSize,
                 color: _getKeyTextColor(key),
               ),
             ),

@@ -1,15 +1,37 @@
 import 'package:flutter/material.dart';
 import '../models/game_state.dart';
 import '../models/tile_state.dart';
+import '../utils/constants.dart';
 import 'wordle_tile.dart';
+import 'shake_widget.dart';
 
-class GameGrid extends StatelessWidget {
+class GameGrid extends StatefulWidget {
   final GameState gameState;
+  final bool shakeCurrentRow;
 
-  const GameGrid({super.key, required this.gameState});
+  const GameGrid({
+    super.key,
+    required this.gameState,
+    this.shakeCurrentRow = false,
+  });
+
+  @override
+  State<GameGrid> createState() => _GameGridState();
+}
+
+class _GameGridState extends State<GameGrid> {
+  int _lastCompletedRow = -1;
+
+  @override
+  void didUpdateWidget(GameGrid oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.gameState.currentRow > oldWidget.gameState.currentRow) {
+      _lastCompletedRow = oldWidget.gameState.currentRow;
+    }
+  }
 
   List<TileState> _getCurrentRowTiles() {
-    final currentGuess = gameState.currentGuess;
+    final currentGuess = widget.gameState.currentGuess;
     final tiles = <TileState>[];
 
     for (int i = 0; i < GameState.wordLength; i++) {
@@ -17,7 +39,8 @@ class GameGrid extends StatelessWidget {
         tiles.add(
           TileState(
             letter: currentGuess[i],
-            status: gameState.guesses[gameState.currentRow][i].status,
+            status:
+                widget.gameState.guesses[widget.gameState.currentRow][i].status,
           ),
         );
       } else {
@@ -34,12 +57,14 @@ class GameGrid extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(GameState.maxAttempts, (rowIndex) {
         final isCurrentRow =
-            rowIndex == gameState.currentRow && !gameState.isGameOver;
+            rowIndex == widget.gameState.currentRow &&
+            !widget.gameState.isGameOver;
+        final shouldAnimate = rowIndex == _lastCompletedRow;
 
         List<TileState> rowTiles;
-        if (rowIndex < gameState.currentRow) {
+        if (rowIndex < widget.gameState.currentRow) {
           // Past guesses - show evaluated tiles
-          rowTiles = gameState.guesses[rowIndex];
+          rowTiles = widget.gameState.guesses[rowIndex];
         } else if (isCurrentRow) {
           // Current row being typed
           rowTiles = _getCurrentRowTiles();
@@ -52,18 +77,28 @@ class GameGrid extends StatelessWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(GameState.wordLength, (colIndex) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                child: WordleTile(
-                  tileState: rowTiles[colIndex],
-                  isCurrentRow: isCurrentRow,
-                ),
-              );
-            }),
+          padding: EdgeInsets.symmetric(vertical: AppSizes.gridRowGap / 2),
+          child: ShakeWidget(
+            shake: isCurrentRow && widget.shakeCurrentRow,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(GameState.wordLength, (colIndex) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.tileGap / 2,
+                  ),
+                  child: WordleTile(
+                    key: ValueKey(
+                      '$rowIndex-$colIndex-${rowTiles[colIndex].letter}',
+                    ),
+                    tileState: rowTiles[colIndex],
+                    isCurrentRow: isCurrentRow,
+                    index: colIndex,
+                    animate: shouldAnimate,
+                  ),
+                );
+              }),
+            ),
           ),
         );
       }),
