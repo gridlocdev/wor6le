@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
 
 class SettingsDialog extends StatefulWidget {
   final bool colorBlindMode;
@@ -32,6 +33,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: AppColors.getBackgroundColor(_darkMode),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 400),
@@ -43,23 +45,37 @@ class _SettingsDialogState extends State<SettingsDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'SETTINGS',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: AppColors.getTextColorForBackground(_darkMode),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.getTextColorForBackground(_darkMode),
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
             const SizedBox(height: 20),
             SwitchListTile(
-              title: const Text('Color Blind Mode'),
-              subtitle: const Text('High contrast colors'),
+              title: Text(
+                'Color Blind Mode',
+                style: TextStyle(
+                  color: AppColors.getTextColorForBackground(_darkMode),
+                ),
+              ),
+              subtitle: Text(
+                'High contrast colors',
+                style: TextStyle(
+                  color: _darkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
               value: _colorBlindMode,
               onChanged: (value) {
                 setState(() {
@@ -70,8 +86,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             const Divider(),
             SwitchListTile(
-              title: const Text('Dark Mode'),
-              subtitle: const Text('Dark theme'),
+              title: Text(
+                'Dark Mode',
+                style: TextStyle(
+                  color: AppColors.getTextColorForBackground(_darkMode),
+                ),
+              ),
+              subtitle: Text(
+                'Dark theme',
+                style: TextStyle(
+                  color: _darkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
               value: _darkMode,
               onChanged: (value) {
                 setState(() {
@@ -81,11 +107,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
               },
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'WOR6LE v1.0.0',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey,
+                color: _darkMode ? Colors.grey[500] : Colors.grey,
               ),
             ),
           ],

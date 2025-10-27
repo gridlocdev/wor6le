@@ -151,6 +151,8 @@ class _GameScreenState extends State<GameScreen> {
                 builder: (context) => StatsDialog(
                   statistics: _statistics,
                   gameState: _controller.gameState,
+                  colorBlindMode: _colorBlindMode,
+                  darkMode: _darkMode,
                 ),
               );
             },
@@ -197,7 +199,10 @@ class _GameScreenState extends State<GameScreen> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => const HelpDialog(),
+                  builder: (context) => HelpDialog(
+                    colorBlindMode: _colorBlindMode,
+                    darkMode: _darkMode,
+                  ),
                 );
               },
             ),
@@ -235,6 +240,8 @@ class _GameScreenState extends State<GameScreen> {
                   builder: (context) => StatsDialog(
                     statistics: _statistics,
                     gameState: _controller.gameState,
+                    colorBlindMode: _colorBlindMode,
+                    darkMode: _darkMode,
                   ),
                 );
               },

@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/game_statistics.dart';
 import '../models/game_state.dart';
+import '../utils/constants.dart';
 
 class StatsDialog extends StatelessWidget {
   final GameStatistics statistics;
   final GameState? gameState;
+  final bool colorBlindMode;
+  final bool darkMode;
 
   const StatsDialog({
     super.key,
     required this.statistics,
     this.gameState,
+    this.colorBlindMode = false,
+    this.darkMode = false,
   });
 
   String _generateShareText() {
@@ -20,9 +25,9 @@ class StatsDialog extends StatelessWidget {
 
     final isWin = gameState!.status.toString().contains('won');
     final attempts = isWin ? gameState!.currentRow : 'X';
-    
+
     String result = 'Wor6le $attempts/6\n\n';
-    
+
     for (int i = 0; i < gameState!.currentRow && i < 6; i++) {
       for (var tile in gameState!.guesses[i]) {
         switch (tile.status.toString()) {
@@ -38,7 +43,7 @@ class StatsDialog extends StatelessWidget {
       }
       result += '\n';
     }
-    
+
     return result;
   }
 
@@ -58,6 +63,7 @@ class StatsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: AppColors.getBackgroundColor(darkMode),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500),
@@ -69,15 +75,19 @@ class StatsDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'STATISTICS',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: AppColors.getTextColorForBackground(darkMode),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.getTextColorForBackground(darkMode),
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -86,10 +96,7 @@ class StatsDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildStatItem(
-                  statistics.gamesPlayed.toString(),
-                  'Played',
-                ),
+                _buildStatItem(statistics.gamesPlayed.toString(), 'Played'),
                 _buildStatItem(
                   statistics.winPercentage.toStringAsFixed(0),
                   'Win %',
@@ -98,18 +105,16 @@ class StatsDialog extends StatelessWidget {
                   statistics.currentStreak.toString(),
                   'Current\nStreak',
                 ),
-                _buildStatItem(
-                  statistics.maxStreak.toString(),
-                  'Max\nStreak',
-                ),
+                _buildStatItem(statistics.maxStreak.toString(), 'Max\nStreak'),
               ],
             ),
             const SizedBox(height: 30),
-            const Text(
+            Text(
               'GUESS DISTRIBUTION',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: AppColors.getTextColorForBackground(darkMode),
               ),
             ),
             const SizedBox(height: 16),
@@ -130,7 +135,10 @@ class StatsDialog extends StatelessWidget {
                       width: 12,
                       child: Text(
                         guessNum.toString(),
-                        style: const TextStyle(fontSize: 14),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.getTextColorForBackground(darkMode),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -139,14 +147,17 @@ class StatsDialog extends StatelessWidget {
                         height: 20,
                         decoration: BoxDecoration(
                           color: count > 0
-                              ? const Color(0xFF6AAA64)
-                              : Colors.grey[300],
+                              ? AppColors.getCorrectColor(colorBlindMode)
+                              : (darkMode
+                                    ? Colors.grey[700]
+                                    : Colors.grey[300]),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         constraints: BoxConstraints(
                           minWidth: 20,
-                          maxWidth: MediaQuery.of(context).size.width * 
-                                   percentage.clamp(0.1, 1.0),
+                          maxWidth:
+                              MediaQuery.of(context).size.width *
+                              percentage.clamp(0.1, 1.0),
                         ),
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -173,7 +184,7 @@ class StatsDialog extends StatelessWidget {
                   icon: const Icon(Icons.share),
                   label: const Text('SHARE'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6AAA64),
+                    backgroundColor: AppColors.getCorrectColor(colorBlindMode),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -191,18 +202,19 @@ class StatsDialog extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
+            color: AppColors.getTextColorForBackground(darkMode),
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.grey,
+            color: darkMode ? Colors.grey[400] : Colors.grey,
           ),
         ),
       ],
