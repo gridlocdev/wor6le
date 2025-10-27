@@ -24,10 +24,7 @@ class HelpDialog extends StatelessWidget {
                 children: [
                   const Text(
                     'HOW TO PLAY',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -49,84 +46,62 @@ class HelpDialog extends StatelessWidget {
               const SizedBox(height: 20),
               const Text(
                 'Examples',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              _buildExample(
-                'W is in the word and in the correct spot.',
-                [
-                  const TileState(
-                    letter: 'W',
-                    status: LetterStatus.correct,
-                  ),
-                  const TileState(letter: 'E', status: LetterStatus.empty),
-                  const TileState(letter: 'A', status: LetterStatus.empty),
-                  const TileState(letter: 'R', status: LetterStatus.empty),
-                  const TileState(letter: 'Y', status: LetterStatus.empty),
-                  const TileState(letter: 'S', status: LetterStatus.empty),
-                ],
-              ),
+              _buildExample('W is in the word and in the correct spot.', [
+                const TileState(letter: 'W', status: LetterStatus.correct),
+                const TileState(letter: 'A', status: LetterStatus.empty),
+                const TileState(letter: 'L', status: LetterStatus.empty),
+                const TileState(letter: 'N', status: LetterStatus.empty),
+                const TileState(letter: 'U', status: LetterStatus.empty),
+                const TileState(letter: 'T', status: LetterStatus.empty),
+              ]),
               const SizedBox(height: 16),
               _buildExample(
-                'I is in the word but in the wrong spot. The arrow → shows it belongs to the right.',
+                'D is in the word but in the wrong spot. The arrow ← shows it belongs to the left.',
                 [
-                  const TileState(letter: 'P', status: LetterStatus.empty),
+                  const TileState(letter: 'I', status: LetterStatus.empty),
+                  const TileState(letter: 'N', status: LetterStatus.empty),
                   const TileState(
-                    letter: 'I',
+                    letter: 'D',
                     status: LetterStatus.present,
-                    arrowDirection: ArrowDirection.right,
-                  ),
-                  const TileState(letter: 'L', status: LetterStatus.empty),
-                  const TileState(letter: 'L', status: LetterStatus.empty),
-                  const TileState(letter: 'S', status: LetterStatus.empty),
-                  const TileState(letter: 'W', status: LetterStatus.empty),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildExample(
-                'U is not in the word in any spot.',
-                [
-                  const TileState(letter: 'V', status: LetterStatus.empty),
-                  const TileState(letter: 'A', status: LetterStatus.empty),
-                  const TileState(letter: 'G', status: LetterStatus.empty),
-                  const TileState(
-                    letter: 'U',
-                    status: LetterStatus.absent,
-                  ),
-                  const TileState(letter: 'E', status: LetterStatus.empty),
-                  const TileState(letter: 'S', status: LetterStatus.empty),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildExample(
-                'L is correct, but appears twice. The arrow ← points to the other L.',
-                [
-                  const TileState(letter: 'H', status: LetterStatus.empty),
-                  const TileState(letter: 'E', status: LetterStatus.empty),
-                  const TileState(
-                    letter: 'L',
-                    status: LetterStatus.correct,
                     arrowDirection: ArrowDirection.left,
                   ),
+                  const TileState(letter: 'I', status: LetterStatus.empty),
+                  const TileState(letter: 'G', status: LetterStatus.empty),
+                  const TileState(letter: 'O', status: LetterStatus.empty),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _buildExample('U is not in the word in any spot.', [
+                const TileState(letter: 'A', status: LetterStatus.empty),
+                const TileState(letter: 'R', status: LetterStatus.empty),
+                const TileState(letter: 'G', status: LetterStatus.empty),
+                const TileState(letter: 'U', status: LetterStatus.absent),
+                const TileState(letter: 'E', status: LetterStatus.empty),
+                const TileState(letter: 'S', status: LetterStatus.empty),
+              ]),
+              const SizedBox(height: 16),
+              _buildExample(
+                'L is correct, but appears twice. The arrow → points to the other L.',
+                [
+                  const TileState(letter: 'F', status: LetterStatus.empty),
+                  const TileState(letter: 'I', status: LetterStatus.empty),
                   const TileState(
                     letter: 'L',
                     status: LetterStatus.correct,
                     arrowDirection: ArrowDirection.right,
                   ),
-                  const TileState(letter: 'O', status: LetterStatus.empty),
-                  const TileState(letter: 'S', status: LetterStatus.empty),
+                  const TileState(letter: 'T', status: LetterStatus.empty),
+                  const TileState(letter: 'E', status: LetterStatus.empty),
+                  const TileState(letter: 'R', status: LetterStatus.empty),
                 ],
               ),
               const SizedBox(height: 20),
               const Text(
                 'A new WOR6LE will be available each day!',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -141,21 +116,20 @@ class HelpDialog extends StatelessWidget {
       children: [
         Row(
           children: tiles
-              .map((tile) => Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: WordleTile(tileState: tile),
-                    ),
-                  ))
+              .map(
+                (tile) => Padding(
+                  padding: const EdgeInsets.only(right: 4.0),
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: WordleTile(tileState: tile),
+                  ),
+                ),
+              )
               .toList(),
         ),
         const SizedBox(height: 8),
-        Text(
-          description,
-          style: const TextStyle(fontSize: 13),
-        ),
+        Text(description, style: const TextStyle(fontSize: 13)),
       ],
     );
   }
