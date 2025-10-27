@@ -53,61 +53,86 @@ class _GameGridState extends State<GameGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(GameState.maxAttempts, (rowIndex) {
-          final isCurrentRow =
-              rowIndex == widget.gameState.currentRow &&
-              !widget.gameState.isGameOver;
-          final shouldAnimate = rowIndex == _lastCompletedRow;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate the maximum tile size that fits within the available space
+        final availableWidth = constraints.maxWidth;
+        final availableHeight = constraints.maxHeight;
 
-          List<TileState> rowTiles;
-          if (rowIndex < widget.gameState.currentRow) {
-            // Past guesses - show evaluated tiles
-            rowTiles = widget.gameState.guesses[rowIndex];
-          } else if (isCurrentRow) {
-            // Current row being typed
-            rowTiles = _getCurrentRowTiles();
-          } else {
-            // Future rows - empty
-            rowTiles = List.generate(
-              GameState.wordLength,
-              (_) => TileState.empty(),
-            );
-          }
+        // Calculate max tile size based on width
+        final totalHorizontalGaps =
+            (GameState.wordLength - 1) * AppSizes.tileGap;
+        final maxTileWidthFromWidth =
+            (availableWidth - totalHorizontalGaps - 40) / GameState.wordLength;
 
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: AppSizes.gridRowGap / 2),
-            child: ShakeWidget(
-              shake: isCurrentRow && widget.shakeCurrentRow,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(GameState.wordLength, (colIndex) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSizes.tileGap / 2,
-                    ),
-                    child: SizedBox(
-                      width: AppSizes.tileSize,
-                      height: AppSizes.tileSize,
-                      child: WordleTile(
-                        key: ValueKey(
-                          '$rowIndex-$colIndex-${rowTiles[colIndex].letter}',
-                        ),
-                        tileState: rowTiles[colIndex],
-                        isCurrentRow: isCurrentRow,
-                        index: colIndex,
-                        animate: shouldAnimate,
+        // Calculate max tile size based on height
+        final totalVerticalGaps =
+            (GameState.maxAttempts - 1) * AppSizes.gridRowGap;
+        final maxTileHeightFromHeight =
+            (availableHeight - totalVerticalGaps - 20) / GameState.maxAttempts;
+
+        // Use the smaller of the two to maintain square tiles
+        final tileSize =
+            (maxTileWidthFromWidth < maxTileHeightFromHeight
+                    ? maxTileWidthFromWidth
+                    : maxTileHeightFromHeight)
+                .clamp(30.0, AppSizes.tileSize);
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(GameState.maxAttempts, (rowIndex) {
+            final isCurrentRow =
+                rowIndex == widget.gameState.currentRow &&
+                !widget.gameState.isGameOver;
+            final shouldAnimate = rowIndex == _lastCompletedRow;
+
+            List<TileState> rowTiles;
+            if (rowIndex < widget.gameState.currentRow) {
+              // Past guesses - show evaluated tiles
+              rowTiles = widget.gameState.guesses[rowIndex];
+            } else if (isCurrentRow) {
+              // Current row being typed
+              rowTiles = _getCurrentRowTiles();
+            } else {
+              // Future rows - empty
+              rowTiles = List.generate(
+                GameState.wordLength,
+                (_) => TileState.empty(),
+              );
+            }
+
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSizes.gridRowGap / 2),
+              child: ShakeWidget(
+                shake: isCurrentRow && widget.shakeCurrentRow,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(GameState.wordLength, (colIndex) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSizes.tileGap / 2,
                       ),
-                    ),
-                  );
-                }),
+                      child: SizedBox(
+                        width: tileSize,
+                        height: tileSize,
+                        child: WordleTile(
+                          key: ValueKey(
+                            '$rowIndex-$colIndex-${rowTiles[colIndex].letter}',
+                          ),
+                          tileState: rowTiles[colIndex],
+                          isCurrentRow: isCurrentRow,
+                          index: colIndex,
+                          animate: shouldAnimate,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
               ),
-            ),
-          );
-        }),
-      ),
+            );
+          }),
+        );
+      },
     );
   }
 }
