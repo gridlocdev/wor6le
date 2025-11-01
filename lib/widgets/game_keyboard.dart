@@ -79,25 +79,33 @@ class GameKeyboard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.all(AppSizes.keyGap / 2),
-      child: Opacity(
+      child: AnimatedOpacity(
         opacity: isAbsent ? 0.4 : 1.0,
-        child: Material(
-          color: _getKeyColor(key, context),
-          borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
-          child: InkWell(
-            onTap: () => _handleKeyPress(key, context),
+        duration: const Duration(milliseconds: 200),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: isWide ? AppSizes.keyWideWidth : AppSizes.keyWidth,
+          height: AppSizes.keyHeight,
+          decoration: BoxDecoration(
+            color: _getKeyColor(key, context),
             borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
-            child: Container(
-              width: isWide ? AppSizes.keyWideWidth : AppSizes.keyWidth,
-              height: AppSizes.keyHeight,
-              alignment: Alignment.center,
-              child: Text(
-                key,
-                style: AppTextStyles.keyLetter.copyWith(
-                  fontSize: key == 'ENTER'
-                      ? AppSizes.keyEnterFontSize
-                      : AppSizes.keyFontSize,
-                  color: _getKeyTextColor(key),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _handleKeyPress(key, context),
+              borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
+              child: Container(
+                alignment: Alignment.center,
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  style: AppTextStyles.keyLetter.copyWith(
+                    fontSize: key == 'ENTER'
+                        ? AppSizes.keyEnterFontSize
+                        : AppSizes.keyFontSize,
+                    color: _getKeyTextColor(key),
+                  ),
+                  child: Text(key),
                 ),
               ),
             ),
