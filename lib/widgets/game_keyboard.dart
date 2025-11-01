@@ -74,26 +74,31 @@ class GameKeyboard extends StatelessWidget {
 
   Widget _buildKey(String key, BuildContext context) {
     final isWide = key == 'ENTER' || key == '⌫';
+    final status = controller.getKeyStatus(key);
+    final isAbsent = status == LetterStatus.absent;
 
     return Padding(
       padding: EdgeInsets.all(AppSizes.keyGap / 2),
-      child: Material(
-        color: _getKeyColor(key, context),
-        borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
-        child: InkWell(
-          onTap: () => _handleKeyPress(key, context),
+      child: Opacity(
+        opacity: isAbsent ? 0.4 : 1.0,
+        child: Material(
+          color: _getKeyColor(key, context),
           borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
-          child: Container(
-            width: isWide ? AppSizes.keyWideWidth : AppSizes.keyWidth,
-            height: AppSizes.keyHeight,
-            alignment: Alignment.center,
-            child: Text(
-              key,
-              style: AppTextStyles.keyLetter.copyWith(
-                fontSize: key == 'ENTER'
-                    ? AppSizes.keyEnterFontSize
-                    : AppSizes.keyFontSize,
-                color: _getKeyTextColor(key),
+          child: InkWell(
+            onTap: () => _handleKeyPress(key, context),
+            borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
+            child: Container(
+              width: isWide ? AppSizes.keyWideWidth : AppSizes.keyWidth,
+              height: AppSizes.keyHeight,
+              alignment: Alignment.center,
+              child: Text(
+                key,
+                style: AppTextStyles.keyLetter.copyWith(
+                  fontSize: key == 'ENTER'
+                      ? AppSizes.keyEnterFontSize
+                      : AppSizes.keyFontSize,
+                  color: _getKeyTextColor(key),
+                ),
               ),
             ),
           ),
