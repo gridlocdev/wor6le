@@ -98,4 +98,4 @@ flutter run
 ## 🙏 Acknowledgments
 
 - Inspiration from the original [Wordle](https://www.nytimes.com/games/wordle/index.html) created by Josh Wardle, now owned by the New York Times.
-- Word list provided by [dwyl/english-words](https://github.com/dwyl/english-words)
+- Word list taken from [dwyl/english-words](https://github.com/dwyl/english-words)
