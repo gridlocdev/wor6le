@@ -10,6 +10,7 @@ import '../dialogs/game_over_dialog.dart';
 import '../services/storage_service.dart';
 import '../models/game_statistics.dart';
 import '../models/game_status.dart';
+import '../models/theme_mode.dart';
 import '../utils/constants.dart';
 
 class GameScreen extends StatefulWidget {
@@ -28,6 +29,7 @@ class _GameScreenState extends State<GameScreen> {
   GameStatistics _statistics = const GameStatistics();
   bool _colorBlindMode = false;
   bool _darkMode = false;
+  AppThemeMode _themeMode = AppThemeMode.system;
   bool _shakeRow = false;
   bool _isInitialized = false;
 
@@ -44,12 +46,18 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _initializeGame() async {
-    // Get system brightness before async operations to avoid BuildContext warning
-    final systemBrightness = MediaQuery.platformBrightnessOf(context);
+    // Get system brightness using WidgetsBinding instead of MediaQuery
+    // to avoid context issues during initState
+    final systemBrightness =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
 
     // Load settings first
     _colorBlindMode = await _storage.getColorBlindMode();
-    _darkMode = await _storage.getDarkMode(systemBrightness: systemBrightness);
+    final themeModeString = await _storage.getThemeMode();
+    _themeMode = AppThemeMode.fromString(themeModeString);
+
+    // Determine dark mode based on theme mode
+    _darkMode = _resolveDarkMode(_themeMode, systemBrightness);
 
     // Load statistics
     _statistics = await _storage.loadStatistics();
@@ -62,6 +70,17 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       _isInitialized = true;
     });
+  }
+
+  bool _resolveDarkMode(AppThemeMode themeMode, Brightness systemBrightness) {
+    switch (themeMode) {
+      case AppThemeMode.system:
+        return systemBrightness == Brightness.dark;
+      case AppThemeMode.light:
+        return false;
+      case AppThemeMode.dark:
+        return true;
+    }
   }
 
   @override
@@ -223,19 +242,36 @@ class _GameScreenState extends State<GameScreen> {
                     builder: (context) => SettingsDialog(
                       colorBlindMode: _colorBlindMode,
                       darkMode: _darkMode,
+                      themeMode: _themeMode,
                       onColorBlindModeChanged: (value) async {
                         setState(() => _colorBlindMode = value);
                         await _storage.setColorBlindMode(value);
                       },
-                      onDarkModeChanged: (value) async {
-                        setState(() => _darkMode = value);
-                        await _storage.setDarkMode(value);
+                      onThemeModeChanged: (themeMode) async {
+                        final systemBrightness = WidgetsBinding
+                            .instance
+                            .platformDispatcher
+                            .platformBrightness;
+                        final newDarkMode = _resolveDarkMode(
+                          themeMode,
+                          systemBrightness,
+                        );
+
+                        setState(() {
+                          _themeMode = themeMode;
+                          _darkMode = newDarkMode;
+                        });
+
+                        await _storage.setThemeMode(
+                          themeMode.toStorageString(),
+                        );
+
                         // Update native window background color
                         try {
                           const platform = MethodChannel('com.wor6le/window');
                           await platform.invokeMethod(
                             'setWindowBackgroundColor',
-                            {'isDark': value},
+                            {'isDark': newDarkMode},
                           );
                         } catch (e) {
                           // Platform channel not available

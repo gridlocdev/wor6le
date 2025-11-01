@@ -14,8 +14,12 @@ void main() async {
 
   // Load theme preference before showing any UI
   final storage = StorageService();
-  final darkMode = await storage.getDarkMode(
-    systemBrightness: systemBrightness,
+  final themeModeString = await storage.getThemeMode();
+
+  // Resolve dark mode based on theme mode setting
+  final darkMode = _resolveDarkModeFromThemeString(
+    themeModeString,
+    systemBrightness,
   );
 
   // Set the system UI overlay style to match the theme
@@ -28,6 +32,21 @@ void main() async {
   );
 
   runApp(MyApp(initialDarkMode: darkMode));
+}
+
+bool _resolveDarkModeFromThemeString(
+  String themeMode,
+  Brightness systemBrightness,
+) {
+  switch (themeMode) {
+    case 'light':
+      return false;
+    case 'dark':
+      return true;
+    case 'system':
+    default:
+      return systemBrightness == Brightness.dark;
+  }
 }
 
 class MyApp extends StatelessWidget {

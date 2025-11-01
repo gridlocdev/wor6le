@@ -7,7 +7,7 @@ class StorageService {
   static const String _statsKey = 'game_statistics';
   static const String _lastPlayedKey = 'last_played_date';
   static const String _colorBlindModeKey = 'color_blind_mode';
-  static const String _darkModeKey = 'dark_mode';
+  static const String _themeModeKey = 'theme_mode';
 
   Future<GameStatistics> loadStatistics() async {
     try {
@@ -80,27 +80,26 @@ class StorageService {
     }
   }
 
-  Future<bool> getDarkMode({Brightness? systemBrightness}) async {
+  /// Get the theme mode preference (system, light, or dark)
+  /// Returns 'system' if no preference is set
+  Future<String> getThemeMode() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      // Check if user has set a preference
-      if (prefs.containsKey(_darkModeKey)) {
-        return prefs.getBool(_darkModeKey) ?? false;
+      // Check new key first
+      if (prefs.containsKey(_themeModeKey)) {
+        return prefs.getString(_themeModeKey) ?? 'system';
       }
-      // If no preference is saved, use system theme
-      if (systemBrightness != null) {
-        return systemBrightness == Brightness.dark;
-      }
-      return false;
+      return 'system';
     } catch (e) {
-      return false;
+      return 'system';
     }
   }
 
-  Future<void> setDarkMode(bool value) async {
+  /// Set the theme mode preference
+  Future<void> setThemeMode(String value) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_darkModeKey, value);
+      await prefs.setString(_themeModeKey, value);
     } catch (e) {
       // Handle error silently
     }

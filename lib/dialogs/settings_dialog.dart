@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
+import '../models/theme_mode.dart';
 
 class SettingsDialog extends StatefulWidget {
   final bool colorBlindMode;
   final bool darkMode;
+  final AppThemeMode themeMode;
   final Function(bool) onColorBlindModeChanged;
-  final Function(bool) onDarkModeChanged;
+  final Function(AppThemeMode) onThemeModeChanged;
 
   const SettingsDialog({
     super.key,
     required this.colorBlindMode,
     required this.darkMode,
+    required this.themeMode,
     required this.onColorBlindModeChanged,
-    required this.onDarkModeChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -22,12 +25,14 @@ class SettingsDialog extends StatefulWidget {
 class _SettingsDialogState extends State<SettingsDialog> {
   late bool _colorBlindMode;
   late bool _darkMode;
+  late AppThemeMode _themeMode;
 
   @override
   void initState() {
     super.initState();
     _colorBlindMode = widget.colorBlindMode;
     _darkMode = widget.darkMode;
+    _themeMode = widget.themeMode;
   }
 
   @override
@@ -66,6 +71,71 @@ class _SettingsDialogState extends State<SettingsDialog> {
               ],
             ),
             const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 16.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Theme',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.getTextColorForBackground(_darkMode),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ThemeButton(
+                          label: 'System',
+                          isSelected: _themeMode == AppThemeMode.system,
+                          darkMode: _darkMode,
+                          onTap: () {
+                            setState(() {
+                              _themeMode = AppThemeMode.system;
+                            });
+                            widget.onThemeModeChanged(AppThemeMode.system);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _ThemeButton(
+                          label: 'Light',
+                          isSelected: _themeMode == AppThemeMode.light,
+                          darkMode: _darkMode,
+                          onTap: () {
+                            setState(() {
+                              _themeMode = AppThemeMode.light;
+                            });
+                            widget.onThemeModeChanged(AppThemeMode.light);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _ThemeButton(
+                          label: 'Dark',
+                          isSelected: _themeMode == AppThemeMode.dark,
+                          darkMode: _darkMode,
+                          onTap: () {
+                            setState(() {
+                              _themeMode = AppThemeMode.dark;
+                            });
+                            widget.onThemeModeChanged(AppThemeMode.dark);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             SwitchListTile(
               title: Text(
                 'Color Blind Mode',
@@ -87,28 +157,6 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 widget.onColorBlindModeChanged(value);
               },
             ),
-            const Divider(),
-            SwitchListTile(
-              title: Text(
-                'Dark Mode',
-                style: TextStyle(
-                  color: AppColors.getTextColorForBackground(_darkMode),
-                ),
-              ),
-              subtitle: Text(
-                'Dark theme',
-                style: TextStyle(
-                  color: _darkMode ? Colors.grey[400] : Colors.grey[600],
-                ),
-              ),
-              value: _darkMode,
-              onChanged: (value) {
-                setState(() {
-                  _darkMode = value;
-                });
-                widget.onDarkModeChanged(value);
-              },
-            ),
             const SizedBox(height: 20),
             Text(
               'WOR6LE v1.0.0',
@@ -118,6 +166,54 @@ class _SettingsDialogState extends State<SettingsDialog> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeButton extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final bool darkMode;
+  final VoidCallback onTap;
+
+  const _ThemeButton({
+    required this.label,
+    required this.isSelected,
+    required this.darkMode,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final backgroundColor = isSelected
+        ? (darkMode ? Colors.green.shade700 : Colors.green.shade600)
+        : (darkMode ? Colors.grey.shade800 : Colors.grey.shade300);
+
+    final textColor = isSelected
+        ? Colors.white
+        : AppColors.getTextColorForBackground(darkMode);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(8),
+          border: isSelected ? Border.all(color: Colors.green, width: 2) : null,
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: textColor,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 14,
+            ),
+          ),
         ),
       ),
     );
