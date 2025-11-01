@@ -277,6 +277,42 @@ class _GameScreenState extends State<GameScreen> {
                           // Platform channel not available
                         }
                       },
+                      onResetSettings: () async {
+                        // Reset to default values
+                        const defaultThemeMode = AppThemeMode.system;
+                        const defaultColorBlindMode = false;
+
+                        await _storage.setColorBlindMode(defaultColorBlindMode);
+                        await _storage.setThemeMode(
+                          defaultThemeMode.toStorageString(),
+                        );
+
+                        final systemBrightness = WidgetsBinding
+                            .instance
+                            .platformDispatcher
+                            .platformBrightness;
+                        final newDarkMode = _resolveDarkMode(
+                          defaultThemeMode,
+                          systemBrightness,
+                        );
+
+                        setState(() {
+                          _colorBlindMode = defaultColorBlindMode;
+                          _themeMode = defaultThemeMode;
+                          _darkMode = newDarkMode;
+                        });
+
+                        // Update native window background color
+                        try {
+                          const platform = MethodChannel('com.wor6le/window');
+                          await platform.invokeMethod(
+                            'setWindowBackgroundColor',
+                            {'isDark': newDarkMode},
+                          );
+                        } catch (e) {
+                          // Platform channel not available
+                        }
+                      },
                     ),
                   );
                 },

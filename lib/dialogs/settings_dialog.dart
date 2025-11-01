@@ -8,6 +8,7 @@ class SettingsDialog extends StatefulWidget {
   final AppThemeMode themeMode;
   final Function(bool) onColorBlindModeChanged;
   final Function(AppThemeMode) onThemeModeChanged;
+  final VoidCallback onResetSettings;
 
   const SettingsDialog({
     super.key,
@@ -16,6 +17,7 @@ class SettingsDialog extends StatefulWidget {
     required this.themeMode,
     required this.onColorBlindModeChanged,
     required this.onThemeModeChanged,
+    required this.onResetSettings,
   });
 
   @override
@@ -168,7 +170,91 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 widget.onColorBlindModeChanged(value);
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            Center(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor: AppColors.getBackgroundColor(
+                          _darkMode,
+                        ),
+                        title: Text(
+                          'Reset Settings',
+                          style: TextStyle(
+                            color: AppColors.getTextColorForBackground(
+                              _darkMode,
+                            ),
+                          ),
+                        ),
+                        content: Text(
+                          'Are you sure you want to reset all settings to their default values?',
+                          style: TextStyle(
+                            color: AppColors.getTextColorForBackground(
+                              _darkMode,
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: _darkMode
+                                    ? Colors.grey[400]
+                                    : Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(
+                                context,
+                              ).pop(); // Close confirmation dialog
+                              widget.onResetSettings();
+                              Navigator.of(
+                                context,
+                              ).pop(); // Close settings dialog
+                            },
+                            child: Text(
+                              'Reset',
+                              style: TextStyle(
+                                color: _colorBlindMode
+                                    ? const Color(0xFFF5793A)
+                                    : Colors.green,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(
+                  Icons.restore,
+                  color: _darkMode ? Colors.grey[400] : Colors.grey[700],
+                ),
+                label: Text(
+                  'Reset Settings',
+                  style: TextStyle(
+                    color: _darkMode ? Colors.grey[400] : Colors.grey[700],
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: _darkMode ? Colors.grey[700]! : Colors.grey[400]!,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             Text(
               'WOR6LE v1.0.0',
               style: TextStyle(
