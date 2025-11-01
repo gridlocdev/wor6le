@@ -3,9 +3,11 @@ import 'dart:io';
 void main(List<String> args) {
   if (args.contains('--help') || args.contains('-h')) {
     print('''
+Word List Sorter
+
 Usage:
-  uppercase_sort <file>
-  uppercase_sort --help
+  dart run word_list_sorter.dart <file>
+  dart run word_list_sorter.dart --help
 
 Arguments:
   <file>      Path to the file to process (required)
