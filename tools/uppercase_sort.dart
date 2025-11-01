@@ -1,6 +1,22 @@
 import 'dart:io';
 
 void main(List<String> args) {
+  if (args.contains('--help') || args.contains('-h')) {
+    print('''
+Usage:
+  uppercase_sort [<file>]
+  uppercase_sort --help
+
+Options:
+  <file>      Path to the file to process. Defaults to ./assets/guesses.txt
+  --help, -h  Show this help message and exit
+
+Description:
+  Reads a text file, converts lines to uppercase, sorts them alphabetically,
+  removes duplicates, and writes the result back to the file atomically.
+''');
+    exit(0);
+  }
   final filePath = args.isNotEmpty ? args[0] : './assets/guesses.txt';
   final file = File(filePath);
 
