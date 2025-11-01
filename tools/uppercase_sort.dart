@@ -4,11 +4,13 @@ void main(List<String> args) {
   if (args.contains('--help') || args.contains('-h')) {
     print('''
 Usage:
-  uppercase_sort [<file>]
+  uppercase_sort <file>
   uppercase_sort --help
 
+Arguments:
+  <file>      Path to the file to process (required)
+
 Options:
-  <file>      Path to the file to process. Defaults to ./assets/guesses.txt
   --help, -h  Show this help message and exit
 
 Description:
@@ -17,7 +19,14 @@ Description:
 ''');
     exit(0);
   }
-  final filePath = args.isNotEmpty ? args[0] : './assets/guesses.txt';
+
+  if (args.isEmpty) {
+    stderr.writeln('Error: file path argument is required');
+    stderr.writeln('Run with --help for usage information');
+    exit(1);
+  }
+
+  final filePath = args[0];
   final file = File(filePath);
 
   if (!file.existsSync()) {
