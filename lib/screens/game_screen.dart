@@ -13,7 +13,9 @@ import '../models/game_status.dart';
 import '../utils/constants.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  final bool? initialDarkMode;
+
+  const GameScreen({super.key, this.initialDarkMode});
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -27,28 +29,36 @@ class _GameScreenState extends State<GameScreen> {
   bool _colorBlindMode = false;
   bool _darkMode = false;
   bool _shakeRow = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _controller = GameController('FLUTTER');
+    // Use the initialDarkMode passed from main to avoid a background
+    // color flash while SharedPreferences loads.
+    if (widget.initialDarkMode != null) {
+      _darkMode = widget.initialDarkMode!;
+    }
     _initializeGame();
   }
 
   Future<void> _initializeGame() async {
-    await _controller.loadWords();
-
-    // Load settings
+    // Load settings first
     _colorBlindMode = await _storage.getColorBlindMode();
     _darkMode = await _storage.getDarkMode();
 
     // Load statistics
     _statistics = await _storage.loadStatistics();
 
-    // Initialize a new game
+    // Load words and initialize game
+    await _controller.loadWords();
     _controller.initializeNewGame();
 
-    setState(() {});
+    // Mark as initialized
+    setState(() {
+      _isInitialized = true;
+    });
   }
 
   @override
@@ -146,17 +156,23 @@ class _GameScreenState extends State<GameScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.getAppBarBackgroundColor(_darkMode),
           elevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.refresh,
-              color: AppColors.getTextColorForBackground(_darkMode),
+          leading: Visibility(
+            visible: _isInitialized,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: IconButton(
+              icon: Icon(
+                Icons.refresh,
+                color: AppColors.getTextColorForBackground(_darkMode),
+              ),
+              onPressed: () {
+                setState(() {
+                  _controller.initializeNewGame();
+                });
+              },
+              tooltip: 'New Game',
             ),
-            onPressed: () {
-              setState(() {
-                _controller.initializeNewGame();
-              });
-            },
-            tooltip: 'New Game',
           ),
           title: Text(
             'WOR6LE',
@@ -166,105 +182,139 @@ class _GameScreenState extends State<GameScreen> {
           ),
           centerTitle: true,
           actions: [
-            IconButton(
-              icon: Icon(
-                Icons.help_outline,
-                color: AppColors.getTextColorForBackground(_darkMode),
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => HelpDialog(
-                    colorBlindMode: _colorBlindMode,
-                    darkMode: _darkMode,
-                  ),
-                );
-              },
-              tooltip: 'How to Play',
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.settings_outlined,
-                color: AppColors.getTextColorForBackground(_darkMode),
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => SettingsDialog(
-                    colorBlindMode: _colorBlindMode,
-                    darkMode: _darkMode,
-                    onColorBlindModeChanged: (value) async {
-                      setState(() => _colorBlindMode = value);
-                      await _storage.setColorBlindMode(value);
-                    },
-                    onDarkModeChanged: (value) async {
-                      setState(() => _darkMode = value);
-                      await _storage.setDarkMode(value);
-                    },
-                  ),
-                );
-              },
-              tooltip: 'Settings',
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.bar_chart,
-                color: AppColors.getTextColorForBackground(_darkMode),
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => StatsDialog(
-                    statistics: _statistics,
-                    gameState: _controller.gameState,
-                    colorBlindMode: _colorBlindMode,
-                    darkMode: _darkMode,
-                    onReset: () async {
-                      await _storage.resetStatistics();
-                      final newStats = await _storage.loadStatistics();
-                      setState(() {
-                        _statistics = newStats;
-                      });
-                    },
-                  ),
-                );
-              },
-              tooltip: 'Statistics',
-            ),
-          ],
-        ),
-        body: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, _) {
-            return Column(
-              children: [
-                SizedBox(height: AppSizes.screenPadding),
-                Expanded(
-                  child: Center(
-                    child: GameGrid(
-                      gameState: _controller.gameState,
-                      shakeCurrentRow: _shakeRow,
+            Visibility(
+              visible: _isInitialized,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              child: IconButton(
+                icon: Icon(
+                  Icons.help_outline,
+                  color: AppColors.getTextColorForBackground(_darkMode),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => HelpDialog(
                       colorBlindMode: _colorBlindMode,
                       darkMode: _darkMode,
                     ),
-                  ),
+                  );
+                },
+                tooltip: 'How to Play',
+              ),
+            ),
+            Visibility(
+              visible: _isInitialized,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              child: IconButton(
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: AppColors.getTextColorForBackground(_darkMode),
                 ),
-                GameKeyboard(
-                  controller: _controller,
-                  colorBlindMode: _colorBlindMode,
-                  darkMode: _darkMode,
-                  onInvalidGuess: () {
-                    setState(() => _shakeRow = true);
-                    Future.delayed(const Duration(milliseconds: 500), () {
-                      if (mounted) setState(() => _shakeRow = false);
-                    });
-                  },
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => SettingsDialog(
+                      colorBlindMode: _colorBlindMode,
+                      darkMode: _darkMode,
+                      onColorBlindModeChanged: (value) async {
+                        setState(() => _colorBlindMode = value);
+                        await _storage.setColorBlindMode(value);
+                      },
+                      onDarkModeChanged: (value) async {
+                        setState(() => _darkMode = value);
+                        await _storage.setDarkMode(value);
+                        // Update native window background color
+                        try {
+                          const platform = MethodChannel('com.wor6le/window');
+                          await platform.invokeMethod(
+                            'setWindowBackgroundColor',
+                            {'isDark': value},
+                          );
+                        } catch (e) {
+                          // Platform channel not available
+                        }
+                      },
+                    ),
+                  );
+                },
+                tooltip: 'Settings',
+              ),
+            ),
+            Visibility(
+              visible: _isInitialized,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              child: IconButton(
+                icon: Icon(
+                  Icons.bar_chart,
+                  color: AppColors.getTextColorForBackground(_darkMode),
                 ),
-                SizedBox(height: AppSizes.screenPadding),
-              ],
-            );
-          },
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => StatsDialog(
+                      statistics: _statistics,
+                      gameState: _controller.gameState,
+                      colorBlindMode: _colorBlindMode,
+                      darkMode: _darkMode,
+                      onReset: () async {
+                        await _storage.resetStatistics();
+                        final newStats = await _storage.loadStatistics();
+                        setState(() {
+                          _statistics = newStats;
+                        });
+                      },
+                    ),
+                  );
+                },
+                tooltip: 'Statistics',
+              ),
+            ),
+          ],
         ),
+        body: !_isInitialized
+            ? Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.getTextColorForBackground(_darkMode),
+                ),
+              )
+            : ListenableBuilder(
+                listenable: _controller,
+                builder: (context, _) {
+                  return Column(
+                    children: [
+                      SizedBox(height: AppSizes.screenPadding),
+                      Expanded(
+                        child: Center(
+                          child: GameGrid(
+                            gameState: _controller.gameState,
+                            shakeCurrentRow: _shakeRow,
+                            colorBlindMode: _colorBlindMode,
+                            darkMode: _darkMode,
+                          ),
+                        ),
+                      ),
+                      GameKeyboard(
+                        controller: _controller,
+                        colorBlindMode: _colorBlindMode,
+                        darkMode: _darkMode,
+                        onInvalidGuess: () {
+                          setState(() => _shakeRow = true);
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            if (mounted) setState(() => _shakeRow = false);
+                          });
+                        },
+                      ),
+                      SizedBox(height: AppSizes.screenPadding),
+                    ],
+                  );
+                },
+              ),
       ),
     );
   }

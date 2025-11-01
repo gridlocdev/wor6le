@@ -1,12 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'screens/game_screen.dart';
+import 'services/storage_service.dart';
+import 'utils/constants.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load theme preference before showing any UI
+  final storage = StorageService();
+  final darkMode = await storage.getDarkMode();
+
+  // Set the system UI overlay style to match the theme
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: darkMode ? Brightness.light : Brightness.dark,
+      statusBarBrightness: darkMode ? Brightness.dark : Brightness.light,
+    ),
+  );
+
+  runApp(MyApp(initialDarkMode: darkMode));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool initialDarkMode;
+
+  const MyApp({super.key, required this.initialDarkMode});
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +38,47 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
         fontFamily: 'Roboto',
+        scaffoldBackgroundColor: AppColors.getBackgroundColor(initialDarkMode),
       ),
-      home: const GameScreen(),
+      home: FadeInWrapper(child: GameScreen(initialDarkMode: initialDarkMode)),
     );
+  }
+}
+
+class FadeInWrapper extends StatefulWidget {
+  final Widget child;
+
+  const FadeInWrapper({super.key, required this.child});
+
+  @override
+  State<FadeInWrapper> createState() => _FadeInWrapperState();
+}
+
+class _FadeInWrapperState extends State<FadeInWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    // Start the fade-in animation
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(opacity: _animation, child: widget.child);
   }
 }
