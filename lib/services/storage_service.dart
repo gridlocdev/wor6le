@@ -80,10 +80,18 @@ class StorageService {
     }
   }
 
-  Future<bool> getDarkMode() async {
+  Future<bool> getDarkMode({Brightness? systemBrightness}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getBool(_darkModeKey) ?? false;
+      // Check if user has set a preference
+      if (prefs.containsKey(_darkModeKey)) {
+        return prefs.getBool(_darkModeKey) ?? false;
+      }
+      // If no preference is saved, use system theme
+      if (systemBrightness != null) {
+        return systemBrightness == Brightness.dark;
+      }
+      return false;
     } catch (e) {
       return false;
     }

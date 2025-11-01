@@ -44,9 +44,12 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _initializeGame() async {
+    // Get system brightness before async operations to avoid BuildContext warning
+    final systemBrightness = MediaQuery.platformBrightnessOf(context);
+
     // Load settings first
     _colorBlindMode = await _storage.getColorBlindMode();
-    _darkMode = await _storage.getDarkMode();
+    _darkMode = await _storage.getDarkMode(systemBrightness: systemBrightness);
 
     // Load statistics
     _statistics = await _storage.loadStatistics();

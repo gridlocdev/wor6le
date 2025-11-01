@@ -8,9 +8,15 @@ void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Get system brightness to use as default if no user preference exists
+  final systemBrightness =
+      WidgetsBinding.instance.platformDispatcher.platformBrightness;
+
   // Load theme preference before showing any UI
   final storage = StorageService();
-  final darkMode = await storage.getDarkMode();
+  final darkMode = await storage.getDarkMode(
+    systemBrightness: systemBrightness,
+  );
 
   // Set the system UI overlay style to match the theme
   SystemChrome.setSystemUIOverlayStyle(
