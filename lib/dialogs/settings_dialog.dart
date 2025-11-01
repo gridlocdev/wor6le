@@ -178,36 +178,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        backgroundColor: AppColors.getBackgroundColor(
-                          _darkMode,
-                        ),
-                        title: Text(
-                          'Reset Settings',
-                          style: TextStyle(
-                            color: AppColors.getTextColorForBackground(
-                              _darkMode,
-                            ),
-                          ),
-                        ),
-                        content: Text(
+                        title: const Text('Reset Settings'),
+                        content: const Text(
                           'Are you sure you want to reset all settings to their default values?',
-                          style: TextStyle(
-                            color: AppColors.getTextColorForBackground(
-                              _darkMode,
-                            ),
-                          ),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: _darkMode
-                                    ? Colors.grey[400]
-                                    : Colors.grey[700],
-                              ),
-                            ),
+                            child: const Text('Cancel'),
                           ),
                           TextButton(
                             onPressed: () {
@@ -219,14 +197,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                                 context,
                               ).pop(); // Close settings dialog
                             },
-                            child: Text(
-                              'Reset',
-                              style: TextStyle(
-                                color: _colorBlindMode
-                                    ? const Color(0xFFF5793A)
-                                    : Colors.green,
-                              ),
-                            ),
+                            child: const Text('Reset'),
                           ),
                         ],
                       );
