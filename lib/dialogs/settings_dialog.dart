@@ -95,6 +95,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                           label: 'System',
                           isSelected: _themeMode == AppThemeMode.system,
                           darkMode: _darkMode,
+                          colorBlindMode: _colorBlindMode,
                           onTap: () {
                             setState(() {
                               _themeMode = AppThemeMode.system;
@@ -109,6 +110,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                           label: 'Light',
                           isSelected: _themeMode == AppThemeMode.light,
                           darkMode: _darkMode,
+                          colorBlindMode: _colorBlindMode,
                           onTap: () {
                             setState(() {
                               _themeMode = AppThemeMode.light;
@@ -123,6 +125,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                           label: 'Dark',
                           isSelected: _themeMode == AppThemeMode.dark,
                           darkMode: _darkMode,
+                          colorBlindMode: _colorBlindMode,
                           onTap: () {
                             setState(() {
                               _themeMode = AppThemeMode.dark;
@@ -150,6 +153,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 ),
               ),
               value: _colorBlindMode,
+              activeTrackColor: _colorBlindMode
+                  ? const Color(0xFFF5793A).withValues(
+                      alpha: 0.5,
+                    ) // Orange for colorblind mode
+                  : null, // Default green
+              activeThumbColor: _colorBlindMode
+                  ? const Color(0xFFF5793A) // Orange for colorblind mode
+                  : null, // Default green
               onChanged: (value) {
                 setState(() {
                   _colorBlindMode = value;
@@ -176,19 +187,32 @@ class _ThemeButton extends StatelessWidget {
   final String label;
   final bool isSelected;
   final bool darkMode;
+  final bool colorBlindMode;
   final VoidCallback onTap;
 
   const _ThemeButton({
     required this.label,
     required this.isSelected,
     required this.darkMode,
+    required this.colorBlindMode,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Use orange for colorblind mode, green otherwise
+    final activeColor = colorBlindMode
+        ? const Color(0xFFF5793A) // Orange
+        : Colors.green;
+
     final backgroundColor = isSelected
-        ? (darkMode ? Colors.green.shade700 : Colors.green.shade600)
+        ? (darkMode
+              ? (colorBlindMode
+                    ? const Color(0xFFD16530)
+                    : Colors.green.shade700)
+              : (colorBlindMode
+                    ? const Color(0xFFF5793A)
+                    : Colors.green.shade600))
         : (darkMode ? Colors.grey.shade800 : Colors.grey.shade300);
 
     final textColor = isSelected
@@ -203,7 +227,7 @@ class _ThemeButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(8),
-          border: isSelected ? Border.all(color: Colors.green, width: 2) : null,
+          border: isSelected ? Border.all(color: activeColor, width: 2) : null,
         ),
         child: Center(
           child: Text(
