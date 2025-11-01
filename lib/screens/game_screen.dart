@@ -6,6 +6,7 @@ import '../widgets/game_keyboard.dart';
 import '../dialogs/help_dialog.dart';
 import '../dialogs/settings_dialog.dart';
 import '../dialogs/stats_dialog.dart';
+import '../dialogs/game_over_dialog.dart';
 import '../services/storage_service.dart';
 import '../models/game_statistics.dart';
 import '../models/game_status.dart';
@@ -111,49 +112,25 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showGameOverDialog() {
-    final isWin = _controller.gameState.status == GameStatus.won;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isWin ? 'Congratulations!' : 'Game Over'),
-        content: Text(
-          isWin
-              ? 'You won in ${_controller.gameState.currentRow} ${_controller.gameState.currentRow == 1 ? 'guess' : 'guesses'}!'
-              : 'The word was: ${_controller.gameState.targetWord}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              showDialog(
-                context: context,
-                builder: (context) => StatsDialog(
-                  statistics: _statistics,
-                  gameState: _controller.gameState,
-                  colorBlindMode: _colorBlindMode,
-                  darkMode: _darkMode,
-                  onReset: () async {
-                    await _storage.resetStatistics();
-                    final newStats = await _storage.loadStatistics();
-                    setState(() {
-                      _statistics = newStats;
-                    });
-                  },
-                ),
-              );
-            },
-            child: const Text('View Stats'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              setState(() {
-                _controller.initializeNewGame();
-              });
-            },
-            child: const Text('Play Again'),
-          ),
-        ],
+      builder: (context) => GameOverDialog(
+        gameState: _controller.gameState,
+        statistics: _statistics,
+        colorBlindMode: _colorBlindMode,
+        darkMode: _darkMode,
+        onPlayAgain: () {
+          setState(() {
+            _controller.initializeNewGame();
+          });
+        },
+        onResetStats: () async {
+          await _storage.resetStatistics();
+          final newStats = await _storage.loadStatistics();
+          setState(() {
+            _statistics = newStats;
+          });
+        },
       ),
     );
   }
