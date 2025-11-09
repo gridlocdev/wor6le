@@ -11,7 +11,7 @@ I play the regular [Wordle](https://www.nytimes.com/games/wordle) super often, b
 - I'd keep coming up with 6 letter words instead of the usual 5 in the regular Wordle game.
 - I'd get lots of yellow letters but sometimes draw a complete blank on what the word could be.
 
-## 🎮 How to Play
+## How to Play
 
 WOR6LE is a word guessing game about guessing the correct 6-letter word.
 
@@ -71,7 +71,7 @@ R&nbsp;&nbsp;&nbsp;
 
 L is correct, but appears twice. The arrow → points to the other L.
 
-## 🛠️ Setting up the project
+## Setting up the project
 
 ### Prerequisites
 - Flutter SDK (3.9.2 or higher)
@@ -97,7 +97,7 @@ Here's the list of platforms I've tested this on so far.
 - ✅ Web
 - ✅ macOS
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Inspiration from the original [Wordle](https://www.nytimes.com/games/wordle/index.html) created by Josh Wardle, now owned by the New York Times.
 - Word list taken from [dwyl/english-words](https://github.com/dwyl/english-words)
