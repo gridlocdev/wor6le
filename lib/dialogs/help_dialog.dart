@@ -72,12 +72,14 @@ class HelpDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
-                'Examples',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.getTextColorForBackground(darkMode),
+              Center(
+                child: Text(
+                  'Examples',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.getTextColorForBackground(darkMode),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -111,7 +113,8 @@ class HelpDialog extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const TextSpan(
-                      text: ' is in the word but in the wrong spot. The arrow ',
+                      text:
+                          ' is in the word but in the wrong spot. \nThe arrow ',
                     ),
                     const TextSpan(
                       text: '←',
@@ -162,7 +165,7 @@ class HelpDialog extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const TextSpan(
-                      text: ' is correct, but appears twice. The arrow ',
+                      text: ' is correct, but appears twice. \nThe arrow ',
                     ),
                     const TextSpan(
                       text: '→',
@@ -241,9 +244,10 @@ class HelpDialog extends StatelessWidget {
 
   Widget _buildExample(InlineSpan description, List<TileState> tiles) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: tiles
               .map(
                 (tile) => Padding(
@@ -263,6 +267,7 @@ class HelpDialog extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         RichText(
+          textAlign: TextAlign.center,
           text: TextSpan(
             style: TextStyle(
               fontSize: 13,
