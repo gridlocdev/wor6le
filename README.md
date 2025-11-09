@@ -2,7 +2,7 @@
 
 A Flutter implementation of the popular word game Wordle with two updates:
 1. Use **6 letters** instead of 5.
-2. For yellow letters, add **Directional arrows** (← or →) which point towards where they belong.
+2. For letters found in other positions in the word, add **Directional arrows** (**←** or **→**) which point towards where those letters are.
 
 ## Inspiration
 
@@ -91,9 +91,11 @@ flutter run
 ```
 
 ### Available Platforms
+
+Here's the list of platforms I've tested this on so far.
+
 - ✅ Web
 - ✅ macOS
-- *(I only use those two above at the moment, but since Flutter is a fully cross-platform framework, you can re-compile for other platforms and it'll likely just work.)*
 
 ## 🙏 Acknowledgments
 
