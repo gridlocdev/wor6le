@@ -80,17 +80,45 @@ class HelpDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildExample('W is in the word and in the correct spot.', [
-                const TileState(letter: 'W', status: LetterStatus.correct),
-                const TileState(letter: 'A', status: LetterStatus.empty),
-                const TileState(letter: 'L', status: LetterStatus.empty),
-                const TileState(letter: 'N', status: LetterStatus.empty),
-                const TileState(letter: 'U', status: LetterStatus.empty),
-                const TileState(letter: 'T', status: LetterStatus.empty),
-              ]),
+              _buildExample(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'W',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(
+                      text: ' is in the word and in the correct spot.',
+                    ),
+                  ],
+                ),
+                [
+                  const TileState(letter: 'W', status: LetterStatus.correct),
+                  const TileState(letter: 'A', status: LetterStatus.empty),
+                  const TileState(letter: 'L', status: LetterStatus.empty),
+                  const TileState(letter: 'N', status: LetterStatus.empty),
+                  const TileState(letter: 'U', status: LetterStatus.empty),
+                  const TileState(letter: 'T', status: LetterStatus.empty),
+                ],
+              ),
               const SizedBox(height: 16),
               _buildExample(
-                'D is in the word but in the wrong spot. The arrow ← shows it belongs to the left.',
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'D',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(
+                      text: ' is in the word but in the wrong spot. The arrow ',
+                    ),
+                    const TextSpan(
+                      text: '←',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(text: ' shows it belongs to the left.'),
+                  ],
+                ),
                 [
                   const TileState(letter: 'I', status: LetterStatus.empty),
                   const TileState(letter: 'N', status: LetterStatus.empty),
@@ -105,17 +133,48 @@ class HelpDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildExample('U is not in the word in any spot.', [
-                const TileState(letter: 'A', status: LetterStatus.empty),
-                const TileState(letter: 'R', status: LetterStatus.empty),
-                const TileState(letter: 'G', status: LetterStatus.empty),
-                const TileState(letter: 'U', status: LetterStatus.absent),
-                const TileState(letter: 'E', status: LetterStatus.empty),
-                const TileState(letter: 'S', status: LetterStatus.empty),
-              ]),
+              _buildExample(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'U',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(text: ' is not in the word in any spot.'),
+                  ],
+                ),
+                [
+                  const TileState(letter: 'A', status: LetterStatus.empty),
+                  const TileState(letter: 'R', status: LetterStatus.empty),
+                  const TileState(letter: 'G', status: LetterStatus.empty),
+                  const TileState(letter: 'U', status: LetterStatus.absent),
+                  const TileState(letter: 'E', status: LetterStatus.empty),
+                  const TileState(letter: 'S', status: LetterStatus.empty),
+                ],
+              ),
               const SizedBox(height: 16),
               _buildExample(
-                'L is correct, but appears twice. The arrow → points to the other L!',
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'L',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(
+                      text: ' is correct, but appears twice. The arrow ',
+                    ),
+                    const TextSpan(
+                      text: '→',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(text: ' points to the other '),
+                    const TextSpan(
+                      text: 'L',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(text: '!'),
+                  ],
+                ),
                 [
                   const TileState(letter: 'F', status: LetterStatus.empty),
                   const TileState(letter: 'I', status: LetterStatus.empty),
@@ -179,7 +238,7 @@ class HelpDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildExample(String description, List<TileState> tiles) {
+  Widget _buildExample(InlineSpan description, List<TileState> tiles) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -202,11 +261,13 @@ class HelpDialog extends StatelessWidget {
               .toList(),
         ),
         const SizedBox(height: 8),
-        Text(
-          description,
-          style: TextStyle(
-            fontSize: 13,
-            color: AppColors.getTextColorForBackground(darkMode),
+        RichText(
+          text: TextSpan(
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.getTextColorForBackground(darkMode),
+            ),
+            children: [description],
           ),
         ),
       ],
