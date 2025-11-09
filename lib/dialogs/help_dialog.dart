@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/tile_state.dart';
 import '../models/letter_status.dart';
 import '../models/arrow_direction.dart';
@@ -128,12 +130,46 @@ class HelpDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              Text(
-                'A new WOR6LE will be available each day!',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.getTextColorForBackground(darkMode),
+              Divider(),
+              const SizedBox(height: 20),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.getTextColorForBackground(darkMode),
+                  ),
+                  children: [
+                    const TextSpan(
+                      text:
+                          "Disclaimer: You might have been able to tell, but this isn't the official Wordle game. It is a fan-made version I've created for fun.\n\n",
+                    ),
+                    const TextSpan(
+                      text:
+                          'The original Wordle game owned by the New York Times can be found here: ',
+                    ),
+                    TextSpan(
+                      text: 'https://www.nytimes.com/games/wordle/index.html',
+                      style: TextStyle(
+                        color: darkMode ? Colors.lightBlue : Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () async {
+                          final url = Uri.parse(
+                            'https://www.nytimes.com/games/wordle/index.html',
+                          );
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          }
+                        },
+                    ),
+                    const TextSpan(text: '.'),
+                  ],
                 ),
               ),
             ],
