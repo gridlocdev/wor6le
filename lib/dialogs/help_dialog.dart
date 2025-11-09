@@ -23,7 +23,7 @@ class HelpDialog extends StatelessWidget {
       backgroundColor: AppColors.getBackgroundColor(darkMode),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: const BoxConstraints(maxWidth: 750),
         padding: const EdgeInsets.all(24),
         child: SingleChildScrollView(
           child: Column(
@@ -55,7 +55,7 @@ class HelpDialog extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Guess the WOR6LE in 6 tries.',
+                'A random 6-letter word will be chosen. Guess it within 6 tries to win!',
                 style: TextStyle(
                   fontSize: 16,
                   color: AppColors.getTextColorForBackground(darkMode),
@@ -63,8 +63,9 @@ class HelpDialog extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '• Each guess must be a valid 6-letter word.\n'
-                '• The color of the tiles will change to show how close your guess was.',
+                '• Each guess needs to be a valid 6-letter word.\n'
+                '• The color of each tile will change to show how close your guess was.\n'
+                '• If you see an arrow, it points to the side of the word where that letter belongs.',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.getTextColorForBackground(darkMode),
