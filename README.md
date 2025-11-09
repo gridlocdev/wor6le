@@ -99,5 +99,9 @@ Here's the list of platforms I've tested this on so far.
 
 ## Acknowledgments
 
-- Inspiration from the original [Wordle](https://www.nytimes.com/games/wordle/index.html) created by Josh Wardle, now owned by the New York Times.
+- Inspiration from the original [Wordle](https://www.nytimes.com/games/wordle/index.html).
 - Word list taken from [dwyl/english-words](https://github.com/dwyl/english-words)
+
+## Disclaimer
+
+*Note: This project is not affiliated with or endorsed by The New York Times or Wordle. ‘Wordle’ is a registered trademark of The New York Times.*
