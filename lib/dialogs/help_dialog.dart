@@ -113,7 +113,7 @@ class HelpDialog extends StatelessWidget {
               ]),
               const SizedBox(height: 16),
               _buildExample(
-                'L is correct, but appears twice. The arrow → points to the other L.',
+                'L is correct, but appears twice. The arrow → points to the other L!',
                 [
                   const TileState(letter: 'F', status: LetterStatus.empty),
                   const TileState(letter: 'I', status: LetterStatus.empty),
