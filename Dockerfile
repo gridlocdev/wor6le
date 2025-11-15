@@ -32,30 +32,27 @@ RUN flutter pub get
 # Build Flutter web app with relative paths for subdirectory hosting
 RUN flutter build web --release --base-href ./
 
-# Stage 2: Serve with nginx
-FROM nginx:alpine AS serve
+# Stage 2: Serve with busybox httpd
+FROM busybox:latest AS serve
 
 # Create non-root user
-RUN addgroup -g 1001 -S nginx-user && \
-    adduser -u 1001 -S nginx-user -G nginx-user
+RUN addgroup -g 1001 appuser && \
+    adduser -u 1001 -G appuser -D appuser
+
+# Create directory for web content
+RUN mkdir -p /www
 
 # Copy built web app from build stage
-COPY --from=build /app/build/web /usr/share/nginx/html
-
-# Update nginx to run on port 8080 (non-privileged port)
-RUN sed -i 's/listen\s*80;/listen 8080;/' /etc/nginx/conf.d/default.conf && \
-    sed -i '/user  nginx;/d' /etc/nginx/nginx.conf && \
-    chown -R nginx-user:nginx-user /usr/share/nginx/html && \
-    chown -R nginx-user:nginx-user /var/cache/nginx && \
-    chown -R nginx-user:nginx-user /var/log/nginx && \
-    touch /var/run/nginx.pid && \
-    chown -R nginx-user:nginx-user /var/run/nginx.pid
+COPY --from=build --chown=appuser:appuser /app/build/web /www
 
 # Switch to non-root user
-USER nginx-user
+USER appuser
 
 # Expose port 8080
 EXPOSE 8080
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start busybox httpd server
+# -f: foreground mode
+# -p: port
+# -h: home directory
+CMD ["httpd", "-f", "-p", "8080", "-h", "/www"]
