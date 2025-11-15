@@ -10,30 +10,42 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Create non-root user for build
+RUN useradd -m -u 1001 flutteruser
+
 # Install Flutter SDK
 ENV FLUTTER_HOME=/flutter
 ENV PATH="${FLUTTER_HOME}/bin:${PATH}"
 
 RUN git clone --depth 1 --branch stable https://github.com/flutter/flutter.git ${FLUTTER_HOME} && \
-    flutter config --enable-web && \
+    chown -R flutteruser:flutteruser ${FLUTTER_HOME} && \
+    git config --global --add safe.directory ${FLUTTER_HOME}
+
+# Switch to non-root user and configure Flutter
+USER flutteruser
+RUN flutter config --enable-web && \
     flutter precache --web && \
     flutter doctor -v
 
 # Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY pubspec.yaml pubspec.lock ./
-COPY assets ./assets
-COPY lib ./lib
-COPY web ./web
-COPY analysis_options.yaml ./
+# Copy project files (switch to root temporarily, then back)
+USER root
+COPY --chown=flutteruser:flutteruser pubspec.yaml pubspec.lock ./
+COPY --chown=flutteruser:flutteruser assets ./assets
+COPY --chown=flutteruser:flutteruser lib ./lib
+COPY --chown=flutteruser:flutteruser web ./web
+COPY --chown=flutteruser:flutteruser analysis_options.yaml ./
+
+# Switch back to non-root user
+USER flutteruser
 
 # Get packages
 RUN flutter pub get
 
 # Build Flutter web app with configurable base href
-RUN flutter build web --release --base-href /games/wor6le/
+RUN flutter build web --release --base-href ${BASE_HREF}
 
 # Stage 2: Serve with busybox httpd
 FROM busybox:latest AS serve
