@@ -29,8 +29,8 @@ COPY analysis_options.yaml ./
 # Get packages
 RUN flutter pub get
 
-# Build Flutter web app
-RUN flutter build web --release
+# Build Flutter web app with relative paths for subdirectory hosting
+RUN flutter build web --release --base-href ./
 
 # Stage 2: Serve with nginx
 FROM nginx:alpine AS serve
