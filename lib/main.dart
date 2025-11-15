@@ -66,45 +66,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto',
         scaffoldBackgroundColor: AppColors.getBackgroundColor(initialDarkMode),
       ),
-      home: FadeInWrapper(child: GameScreen(initialDarkMode: initialDarkMode)),
+      home: GameScreen(initialDarkMode: initialDarkMode),
     );
-  }
-}
-
-class FadeInWrapper extends StatefulWidget {
-  final Widget child;
-
-  const FadeInWrapper({super.key, required this.child});
-
-  @override
-  State<FadeInWrapper> createState() => _FadeInWrapperState();
-}
-
-class _FadeInWrapperState extends State<FadeInWrapper>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 250),
-      vsync: this,
-    );
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    // Start the fade-in animation
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(opacity: _animation, child: widget.child);
   }
 }
