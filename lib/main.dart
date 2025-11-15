@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/game_screen.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'services/storage_service.dart';
 import 'utils/constants.dart';
 
@@ -30,7 +31,7 @@ void main() async {
       statusBarBrightness: darkMode ? Brightness.dark : Brightness.light,
     ),
   );
-
+  usePathUrlStrategy();
   runApp(MyApp(initialDarkMode: darkMode));
 }
 
