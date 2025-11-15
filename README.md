@@ -99,16 +99,6 @@ Here's the list of platforms I've tested this on so far.
 - ✅ Web
 - ✅ macOS
 
-### Web Deployment
-
-The web build is configured to use relative paths, allowing it to be hosted in a subdirectory rather than at the domain root. The Docker image builds the app with `--base-href ./` to enable this functionality.
-
-To build and run with Docker:
-```bash
-docker build -t wor6le .
-docker run -p 8080:8080 wor6le
-```
-
 ## Acknowledgments
 
 - Inspiration from the original [Wordle](https://www.nytimes.com/games/wordle/index.html).
