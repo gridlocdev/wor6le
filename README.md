@@ -4,6 +4,8 @@ A Flutter implementation of the popular word game Wordle with two updates:
 1. Use **6 letters** instead of 5.
 2. For letters found in other positions in the word, add **Directional arrows** (**←** or **→**) which point towards where those letters are.
 
+![alt text](game-screenshot.png)
+
 ## Inspiration
 
 I play the regular [Wordle](https://www.nytimes.com/games/wordle) super often, but found myself having a couple of things happen:
