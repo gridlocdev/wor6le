@@ -72,7 +72,13 @@ class GameKeyboard extends StatelessWidget {
     }
   }
 
-  Widget _buildKey(String key, BuildContext context) {
+  Widget _buildKey(
+    String key,
+    BuildContext context,
+    double keyWidth,
+    double keyWideWidth,
+    double keyHeight,
+  ) {
     final isWide = key == 'ENTER' || key == '⌫';
     final status = controller.getKeyStatus(key);
     final isAbsent = status == LetterStatus.absent;
@@ -84,8 +90,8 @@ class GameKeyboard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          width: isWide ? AppSizes.keyWideWidth : AppSizes.keyWidth,
-          height: AppSizes.keyHeight,
+          width: isWide ? keyWideWidth : keyWidth,
+          height: keyHeight,
           decoration: BoxDecoration(
             color: _getKeyColor(key, context),
             borderRadius: BorderRadius.circular(AppSizes.tileBorderRadius),
@@ -117,19 +123,55 @@ class GameKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-      child: Column(
-        children: _keyboardLayout.map((row) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: row.map((key) => _buildKey(key, context)).toList(),
-            ),
-          );
-        }).toList(),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate responsive key sizes based on available width
+        final availableWidth =
+            constraints.maxWidth - 8; // Account for horizontal padding
+
+        // First row has 10 regular keys
+        // Second row has 9 regular keys
+        // Third row has 7 regular keys + 2 wide keys
+
+        // Calculate key width based on the longest row (first row with 10 keys)
+        final totalGaps = (10 * AppSizes.keyGap);
+        final maxKeyWidth = (availableWidth - totalGaps) / 10;
+
+        // Use the smaller of calculated width or default width, with a minimum
+        final keyWidth = maxKeyWidth.clamp(28.0, AppSizes.keyWidth);
+        final keyWideWidth = (keyWidth * 1.5).clamp(
+          42.0,
+          AppSizes.keyWideWidth,
+        );
+
+        // Scale height proportionally, but keep it reasonable
+        final keyHeight = (keyWidth * 1.35).clamp(40.0, AppSizes.keyHeight);
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          child: Column(
+            children: _keyboardLayout.map((row) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: row
+                      .map(
+                        (key) => _buildKey(
+                          key,
+                          context,
+                          keyWidth,
+                          keyWideWidth,
+                          keyHeight,
+                        ),
+                      )
+                      .toList(),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }
