@@ -12,12 +12,14 @@
         {
             "src": "icons/wor6le-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "role": "maskable"
         },
         {
             "src": "icons/wor6le-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "role": "maskable"
         }
     ]
 }
