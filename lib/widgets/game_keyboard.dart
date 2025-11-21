@@ -142,15 +142,21 @@ class GameKeyboard extends StatelessWidget {
         final totalGaps = (10 * AppSizes.keyGap);
         final maxKeyWidth = (availableWidth - totalGaps) / 10;
 
-        // Use the smaller of calculated width or default width, with a minimum
-        final keyWidth = maxKeyWidth.clamp(28.0, AppSizes.keyWidth);
+        // Use calculated width with min constraint to allow expansion
+        final keyWidth = maxKeyWidth.clamp(
+          AppSizes.keyWidthMin,
+          double.infinity,
+        );
         final keyWideWidth = (keyWidth * 1.5).clamp(
-          42.0,
-          AppSizes.keyWideWidth,
+          AppSizes.keyWideWidthMin,
+          double.infinity,
         );
 
-        // Scale height proportionally, but keep it reasonable
-        final keyHeight = (keyWidth * 1.35).clamp(40.0, AppSizes.keyHeight);
+        // Scale height proportionally, with reasonable bounds
+        final keyHeight = (keyWidth * 1.35).clamp(
+          AppSizes.keyHeightMin,
+          AppSizes.keyHeightMax,
+        );
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),

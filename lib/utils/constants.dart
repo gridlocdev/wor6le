@@ -67,7 +67,9 @@ class AppColors {
 
 class AppSizes {
   // Tile dimensions
-  static const double tileSize = 62.0;
+  static const double tileSizeMin = 20.0;
+  static const double tileSizeMax = 80.0;
+  static const double tileSize = 62.0; // Default/preferred size
   static const double tileGap = 4.0;
   static const double tileBorderWidth = 2.0;
   static const double tileBorderRadius = 4.0;
@@ -78,9 +80,13 @@ class AppSizes {
   static const double arrowPadding = 2.0;
 
   // Keyboard
-  static const double keyHeight = 58.0;
-  static const double keyWidth = 43.0;
-  static const double keyWideWidth = 65.0;
+  static const double keyHeightMin = 40.0;
+  static const double keyHeightMax = 80.0;
+  static const double keyHeight = 58.0; // Default/preferred size
+  static const double keyWidthMin = 28.0;
+  static const double keyWidth = 43.0; // Default/preferred size
+  static const double keyWideWidthMin = 42.0;
+  static const double keyWideWidth = 65.0; // Default/preferred size
   static const double keyGap = 4.0;
   static const double keyFontSize = 18.0;
   static const double keyEnterFontSize = 12.0;

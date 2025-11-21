@@ -76,11 +76,12 @@ class _GameGridState extends State<GameGrid> {
             (availableHeight - totalVerticalGaps - 20) / GameState.maxAttempts;
 
         // Use the smaller of the two to maintain square tiles
+        // Allow expansion to fill larger screens while maintaining padding
         final tileSize =
             (maxTileWidthFromWidth < maxTileHeightFromHeight
                     ? maxTileWidthFromWidth
                     : maxTileHeightFromHeight)
-                .clamp(30.0, AppSizes.tileSize);
+                .clamp(AppSizes.tileSizeMin, AppSizes.tileSizeMax);
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
