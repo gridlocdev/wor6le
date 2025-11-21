@@ -379,6 +379,7 @@ class _GameScreenState extends State<GameScreen> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      SizedBox(height: 20),
                       Flexible(
                         flex: 4,
                         child: Center(
