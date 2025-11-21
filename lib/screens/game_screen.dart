@@ -379,40 +379,51 @@ class _GameScreenState extends State<GameScreen> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      isTouchDevice
-                          ? GameGrid(
+                      Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: isTouchDevice ? double.infinity : 500,
+                              maxHeight: isTouchDevice ? double.infinity : 420,
+                            ),
+                            child: GameGrid(
                               gameState: _controller.gameState,
                               shakeCurrentRow: _shakeRow,
                               colorBlindMode: _colorBlindMode,
                               darkMode: _darkMode,
-                            )
-                          : Center(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 500,
-                                  maxHeight: 420,
-                                ),
-                                child: GameGrid(
-                                  gameState: _controller.gameState,
-                                  shakeCurrentRow: _shakeRow,
-                                  colorBlindMode: _colorBlindMode,
-                                  darkMode: _darkMode,
-                                ),
-                              ),
                             ),
-                      GameKeyboard(
-                        controller: _controller,
-                        colorBlindMode: _colorBlindMode,
-                        darkMode: _darkMode,
-                        onInvalidGuess: () {
-                          setState(() => _shakeRow = true);
-                          Future.delayed(const Duration(milliseconds: 500), () {
-                            if (mounted) setState(() => _shakeRow = false);
-                          });
-                        },
-                        onGameOver: () {
-                          _handleGameOver();
-                        },
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 2,
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: isTouchDevice ? double.infinity : 650,
+                            ),
+                            child: GameKeyboard(
+                              controller: _controller,
+                              colorBlindMode: _colorBlindMode,
+                              darkMode: _darkMode,
+                              onInvalidGuess: () {
+                                setState(() => _shakeRow = true);
+                                Future.delayed(
+                                  const Duration(milliseconds: 500),
+                                  () {
+                                    if (mounted) {
+                                      setState(() => _shakeRow = false);
+                                    }
+                                  },
+                                );
+                              },
+                              onGameOver: () {
+                                _handleGameOver();
+                              },
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   );

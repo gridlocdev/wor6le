@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../models/game_state.dart';
 import '../models/tile_state.dart';
@@ -77,11 +79,10 @@ class _GameGridState extends State<GameGrid> {
 
         // Use the smaller of the two to maintain square tiles
         // Allow expansion to fill larger screens while maintaining padding
-        final tileSize =
-            (maxTileWidthFromWidth < maxTileHeightFromHeight
-                    ? maxTileWidthFromWidth
-                    : maxTileHeightFromHeight)
-                .clamp(AppSizes.tileSizeMin, AppSizes.tileSizeMax);
+        final tileSize = min(
+          maxTileWidthFromWidth,
+          maxTileHeightFromHeight,
+        ).clamp(AppSizes.tileSizeMin, AppSizes.tileSizeMax);
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
