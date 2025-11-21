@@ -362,17 +362,13 @@ class _GameScreenState extends State<GameScreen> {
                 listenable: _controller,
                 builder: (context, _) {
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      SizedBox(height: AppSizes.screenPadding),
-                      Expanded(
-                        child: Center(
-                          child: GameGrid(
-                            gameState: _controller.gameState,
-                            shakeCurrentRow: _shakeRow,
-                            colorBlindMode: _colorBlindMode,
-                            darkMode: _darkMode,
-                          ),
-                        ),
+                      GameGrid(
+                        gameState: _controller.gameState,
+                        shakeCurrentRow: _shakeRow,
+                        colorBlindMode: _colorBlindMode,
+                        darkMode: _darkMode,
                       ),
                       GameKeyboard(
                         controller: _controller,
@@ -385,7 +381,6 @@ class _GameScreenState extends State<GameScreen> {
                           });
                         },
                       ),
-                      SizedBox(height: AppSizes.screenPadding),
                     ],
                   );
                 },
