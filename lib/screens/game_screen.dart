@@ -369,15 +369,37 @@ class _GameScreenState extends State<GameScreen> {
             : ListenableBuilder(
                 listenable: _controller,
                 builder: (context, _) {
+                  // Detect if device supports touch
+                  final platform = Theme.of(context).platform;
+                  final isTouchDevice =
+                      platform == TargetPlatform.iOS ||
+                      platform == TargetPlatform.android ||
+                      platform == TargetPlatform.fuchsia;
+
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      GameGrid(
-                        gameState: _controller.gameState,
-                        shakeCurrentRow: _shakeRow,
-                        colorBlindMode: _colorBlindMode,
-                        darkMode: _darkMode,
-                      ),
+                      isTouchDevice
+                          ? GameGrid(
+                              gameState: _controller.gameState,
+                              shakeCurrentRow: _shakeRow,
+                              colorBlindMode: _colorBlindMode,
+                              darkMode: _darkMode,
+                            )
+                          : Center(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxWidth: 500,
+                                  maxHeight: 420,
+                                ),
+                                child: GameGrid(
+                                  gameState: _controller.gameState,
+                                  shakeCurrentRow: _shakeRow,
+                                  colorBlindMode: _colorBlindMode,
+                                  darkMode: _darkMode,
+                                ),
+                              ),
+                            ),
                       GameKeyboard(
                         controller: _controller,
                         colorBlindMode: _colorBlindMode,
