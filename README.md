@@ -90,6 +90,10 @@ flutter pub get
 
 # Run the app
 flutter run
+
+# alternatively, if you want to test the web version on a mobile device, supply a port and serve on the all-network-interfaces address like so:
+# flutter run -d web-server --web-port=8080 --web-hostname=0.0.0.0
+# # Then open your phone's browser and navigate to http://<your-computer-private-ip>:8080
 ```
 
 ### Available Platforms
