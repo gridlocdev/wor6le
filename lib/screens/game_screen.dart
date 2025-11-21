@@ -380,7 +380,7 @@ class _GameScreenState extends State<GameScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Flexible(
-                        flex: 3,
+                        flex: 4,
                         child: Center(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
@@ -397,7 +397,7 @@ class _GameScreenState extends State<GameScreen> {
                         ),
                       ),
                       Flexible(
-                        flex: 2,
+                        flex: 3,
                         child: Center(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(

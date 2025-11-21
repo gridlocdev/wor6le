@@ -81,15 +81,15 @@ class AppSizes {
 
   // Keyboard
   static const double keyHeightMin = 40.0;
-  static const double keyHeightMax = 80.0;
+  static const double keyHeightMax = 58.0;
   static const double keyHeight = 58.0; // Default/preferred size
   static const double keyWidthMin = 28.0;
   static const double keyWidth = 43.0; // Default/preferred size
   static const double keyWideWidthMin = 42.0;
   static const double keyWideWidth = 65.0; // Default/preferred size
   static const double keyGap = 4.0;
-  static const double keyFontSize = 18.0;
-  static const double keyEnterFontSize = 12.0;
+  static const double keyFontSize = 16.0;
+  static const double keyEnterFontSize = 11.0;
 
   // Spacing
   static const double gridRowGap = 8.0;
