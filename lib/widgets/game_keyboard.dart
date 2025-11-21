@@ -6,6 +6,7 @@ import '../utils/constants.dart';
 class GameKeyboard extends StatelessWidget {
   final GameController controller;
   final VoidCallback? onInvalidGuess;
+  final VoidCallback? onGameOver;
   final bool colorBlindMode;
   final bool darkMode;
 
@@ -13,6 +14,7 @@ class GameKeyboard extends StatelessWidget {
     super.key,
     required this.controller,
     this.onInvalidGuess,
+    this.onGameOver,
     this.colorBlindMode = false,
     this.darkMode = false,
   });
@@ -64,6 +66,9 @@ class GameKeyboard extends StatelessWidget {
             backgroundColor: Colors.black87,
           ),
         );
+      } else if (context.mounted && controller.gameState.isGameOver) {
+        // Notify parent that game is over
+        onGameOver?.call();
       }
     } else if (key == '⌫') {
       controller.removeLetter();

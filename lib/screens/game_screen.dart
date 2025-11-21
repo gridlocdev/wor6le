@@ -140,7 +140,15 @@ class _GameScreenState extends State<GameScreen> {
     // Reload statistics
     _statistics = await _storage.loadStatistics();
 
-    _showGameOverDialog();
+    // Use addPostFrameCallback to ensure the dialog shows after the frame
+    // is rendered, which is more reliable on iOS Safari
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _showGameOverDialog();
+        }
+      });
+    }
   }
 
   void _showGameOverDialog() {
@@ -379,6 +387,9 @@ class _GameScreenState extends State<GameScreen> {
                           Future.delayed(const Duration(milliseconds: 500), () {
                             if (mounted) setState(() => _shakeRow = false);
                           });
+                        },
+                        onGameOver: () {
+                          _handleGameOver();
                         },
                       ),
                     ],
