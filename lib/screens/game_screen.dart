@@ -379,7 +379,9 @@ class _GameScreenState extends State<GameScreen> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      SizedBox(height: 20),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
                       Flexible(
                         flex: 4,
                         child: Center(

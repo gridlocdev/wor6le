@@ -83,6 +83,7 @@ class GameKeyboard extends StatelessWidget {
     double keyWidth,
     double keyWideWidth,
     double keyHeight,
+    double fontScale,
   ) {
     final isWide = key == 'ENTER' || key == '⌫';
     final status = controller.getKeyStatus(key);
@@ -112,8 +113,14 @@ class GameKeyboard extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   style: AppTextStyles.keyLetter.copyWith(
                     fontSize: key == 'ENTER'
-                        ? AppSizes.keyEnterFontSize
-                        : AppSizes.keyFontSize,
+                        ? (AppSizes.keyEnterFontSize * fontScale).clamp(
+                            9.0,
+                            AppSizes.keyEnterFontSize,
+                          )
+                        : (AppSizes.keyFontSize * fontScale).clamp(
+                            12.0,
+                            AppSizes.keyFontSize,
+                          ),
                     color: _getKeyTextColor(key),
                   ),
                   child: Text(key),
@@ -145,20 +152,55 @@ class GameKeyboard extends StatelessWidget {
 
         // Apply constraints based on device type
         final maxKeyWidth = isTouchDevice ? double.infinity : AppSizes.keyWidth;
-        final keyWidth = calculatedKeyWidth.clamp(
+        double keyWidth = calculatedKeyWidth.clamp(
           AppSizes.keyWidthMin,
           maxKeyWidth,
         );
-        final keyWideWidth = (keyWidth * 1.5).clamp(
+        double keyWideWidth = (keyWidth * 1.5).clamp(
           AppSizes.keyWideWidthMin,
           keyWidth * 1.5,
         );
 
         // Height maintains aspect ratio
-        final keyHeight = (keyWidth * 1.35).clamp(
+        double keyHeight = (keyWidth * 1.35).clamp(
           AppSizes.keyHeightMin,
           AppSizes.keyHeightMax,
         );
+
+        double fontScale = 1.0;
+
+        if (isTouchDevice && constraints.maxHeight.isFinite) {
+          const containerVerticalPadding = 16.0; // from symmetric padding
+          const rowPadding = 4.0; // each row has 2px top/bottom padding
+          const shrinkThreshold = 12.0; // buffer before we start shrinking
+          const safetyPadding = 8.0; // ensure a little breathing room
+          final rows = _keyboardLayout.length;
+          final intrinsicContentHeight =
+              rows * (keyHeight + AppSizes.keyGap + rowPadding);
+          final totalIntrinsicHeight =
+              intrinsicContentHeight + containerVerticalPadding;
+
+          if (constraints.maxHeight < totalIntrinsicHeight + shrinkThreshold) {
+            final effectiveAvailable =
+                constraints.maxHeight -
+                containerVerticalPadding -
+                safetyPadding;
+            final availableContentHeight = effectiveAvailable.clamp(
+              40.0,
+              intrinsicContentHeight,
+            );
+            final scaleFactor =
+                (availableContentHeight / intrinsicContentHeight).clamp(
+                  0.55,
+                  1.0,
+                );
+
+            keyWidth *= scaleFactor;
+            keyWideWidth *= scaleFactor;
+            keyHeight *= scaleFactor;
+            fontScale = scaleFactor;
+          }
+        }
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -178,6 +220,7 @@ class GameKeyboard extends StatelessWidget {
                           keyWidth,
                           keyWideWidth,
                           keyHeight,
+                          fontScale,
                         ),
                       )
                       .toList(),
