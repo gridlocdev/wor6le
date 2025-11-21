@@ -128,35 +128,50 @@ class GameKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if this is a touch device (mobile/tablet vs desktop)
+    final platform = Theme.of(context).platform;
+    final isTouchDevice =
+        platform == TargetPlatform.iOS ||
+        platform == TargetPlatform.android ||
+        platform == TargetPlatform.fuchsia;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calculate responsive key sizes based on available width
-        final availableWidth =
-            constraints.maxWidth - 8; // Account for horizontal padding
+        final double keyWidth;
+        final double keyWideWidth;
+        final double keyHeight;
 
-        // First row has 10 regular keys
-        // Second row has 9 regular keys
-        // Third row has 7 regular keys + 2 wide keys
+        if (isTouchDevice) {
+          // Calculate responsive key sizes based on available width for touch devices
+          final availableWidth =
+              constraints.maxWidth - 8; // Account for horizontal padding
 
-        // Calculate key width based on the longest row (first row with 10 keys)
-        final totalGaps = (10 * AppSizes.keyGap);
-        final maxKeyWidth = (availableWidth - totalGaps) / 10;
+          // First row has 10 regular keys
+          // Second row has 9 regular keys
+          // Third row has 7 regular keys + 2 wide keys
 
-        // Use calculated width with min constraint to allow expansion
-        final keyWidth = maxKeyWidth.clamp(
-          AppSizes.keyWidthMin,
-          double.infinity,
-        );
-        final keyWideWidth = (keyWidth * 1.5).clamp(
-          AppSizes.keyWideWidthMin,
-          double.infinity,
-        );
+          // Calculate key width based on the longest row (first row with 10 keys)
+          final totalGaps = (10 * AppSizes.keyGap);
+          final maxKeyWidth = (availableWidth - totalGaps) / 10;
 
-        // Scale height proportionally, with reasonable bounds
-        final keyHeight = (keyWidth * 1.35).clamp(
-          AppSizes.keyHeightMin,
-          AppSizes.keyHeightMax,
-        );
+          // Use calculated width with min constraint to allow expansion
+          keyWidth = maxKeyWidth.clamp(AppSizes.keyWidthMin, double.infinity);
+          keyWideWidth = (keyWidth * 1.5).clamp(
+            AppSizes.keyWideWidthMin,
+            double.infinity,
+          );
+
+          // Scale height proportionally, with reasonable bounds
+          keyHeight = (keyWidth * 1.35).clamp(
+            AppSizes.keyHeightMin,
+            AppSizes.keyHeightMax,
+          );
+        } else {
+          // Use default sizes for non-touch devices (desktop)
+          keyWidth = AppSizes.keyWidth;
+          keyWideWidth = AppSizes.keyWideWidth;
+          keyHeight = AppSizes.keyHeight;
+        }
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
