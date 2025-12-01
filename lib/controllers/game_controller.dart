@@ -185,11 +185,25 @@ class GameController extends ChangeNotifier {
       if (guessStatuses[i] == LetterStatus.present) {
         // Yellow letter - find where it should go
         final letter = guessLetters[i];
+        bool hasLeft = false;
+        bool hasRight = false;
+
         for (int j = 0; j < 6; j++) {
           if (targetLetters[j] == letter) {
-            arrowDirection = j < i ? ArrowDirection.left : ArrowDirection.right;
-            break;
+            if (j < i) {
+              hasLeft = true;
+            } else if (j > i) {
+              hasRight = true;
+            }
           }
+        }
+
+        if (hasLeft && hasRight) {
+          arrowDirection = ArrowDirection.both;
+        } else if (hasLeft) {
+          arrowDirection = ArrowDirection.left;
+        } else if (hasRight) {
+          arrowDirection = ArrowDirection.right;
         }
       } else if (guessStatuses[i] == LetterStatus.correct) {
         // Green letter - check if there are duplicates
@@ -201,15 +215,27 @@ class GameController extends ChangeNotifier {
           }
         }
 
-        // If letter appears multiple times in target word, show arrow to other occurrence
+        // If letter appears multiple times in target word, show arrow to other occurrence(s)
         if (positions.length > 1) {
+          bool hasLeft = false;
+          bool hasRight = false;
+
           for (var pos in positions) {
             if (pos != i) {
-              arrowDirection = pos < i
-                  ? ArrowDirection.left
-                  : ArrowDirection.right;
-              break;
+              if (pos < i) {
+                hasLeft = true;
+              } else {
+                hasRight = true;
+              }
             }
+          }
+
+          if (hasLeft && hasRight) {
+            arrowDirection = ArrowDirection.both;
+          } else if (hasLeft) {
+            arrowDirection = ArrowDirection.left;
+          } else if (hasRight) {
+            arrowDirection = ArrowDirection.right;
           }
         }
       }

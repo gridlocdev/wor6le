@@ -113,6 +113,32 @@ class _WordleTileState extends State<WordleTile>
 
     final arrowSize = size ?? AppSizes.arrowSize;
 
+    // If both arrows should be displayed
+    if (widget.tileState.arrowDirection == ArrowDirection.both) {
+      return Stack(
+        children: [
+          Positioned(
+            bottom: AppSizes.arrowPadding,
+            left: AppSizes.arrowPadding,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.white.withValues(alpha: 0.8),
+              size: arrowSize,
+            ),
+          ),
+          Positioned(
+            bottom: AppSizes.arrowPadding,
+            right: AppSizes.arrowPadding,
+            child: Icon(
+              Icons.arrow_forward,
+              color: Colors.white.withValues(alpha: 0.8),
+              size: arrowSize,
+            ),
+          ),
+        ],
+      );
+    }
+
     return Positioned(
       bottom: AppSizes.arrowPadding,
       right: widget.tileState.arrowDirection == ArrowDirection.right

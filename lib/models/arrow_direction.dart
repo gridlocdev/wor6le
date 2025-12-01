@@ -8,4 +8,7 @@ enum ArrowDirection {
 
   /// Arrow pointing right
   right,
+
+  /// Arrows pointing both left and right
+  both,
 }
