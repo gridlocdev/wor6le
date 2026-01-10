@@ -151,6 +151,16 @@ class GameController extends ChangeNotifier {
     final targetMatched = List<bool>.filled(6, false);
     final guessStatuses = List<LetterStatus?>.filled(6, null);
 
+    // Track which positions have already been found in previous guesses
+    final foundPositions = List<bool>.filled(6, false);
+    for (int row = 0; row < _gameState.currentRow; row++) {
+      for (int col = 0; col < 6; col++) {
+        if (_gameState.guesses[row][col].status == LetterStatus.correct) {
+          foundPositions[col] = true;
+        }
+      }
+    }
+
     // First pass: mark correct letters (green)
     for (int i = 0; i < 6; i++) {
       if (guessLetters[i] == targetLetters[i]) {
@@ -183,13 +193,14 @@ class GameController extends ChangeNotifier {
       ArrowDirection arrowDirection = ArrowDirection.none;
 
       if (guessStatuses[i] == LetterStatus.present) {
-        // Yellow letter - find where it should go
+        // Yellow letter - find where it should go (only unfound positions)
         final letter = guessLetters[i];
         bool hasLeft = false;
         bool hasRight = false;
 
         for (int j = 0; j < 6; j++) {
-          if (targetLetters[j] == letter) {
+          // Only point to positions that haven't been found yet
+          if (targetLetters[j] == letter && !foundPositions[j]) {
             if (j < i) {
               hasLeft = true;
             } else if (j > i) {
@@ -206,7 +217,7 @@ class GameController extends ChangeNotifier {
           arrowDirection = ArrowDirection.right;
         }
       } else if (guessStatuses[i] == LetterStatus.correct) {
-        // Green letter - check if there are duplicates
+        // Green letter - check if there are duplicates (only unfound positions)
         final letter = guessLetters[i];
         final positions = <int>[];
         for (int j = 0; j < 6; j++) {
@@ -215,13 +226,14 @@ class GameController extends ChangeNotifier {
           }
         }
 
-        // If letter appears multiple times in target word, show arrow to other occurrence(s)
+        // If letter appears multiple times in target word, show arrow to other unfound occurrence(s)
         if (positions.length > 1) {
           bool hasLeft = false;
           bool hasRight = false;
 
           for (var pos in positions) {
-            if (pos != i) {
+            // Only point to positions that haven't been found yet
+            if (pos != i && !foundPositions[pos]) {
               if (pos < i) {
                 hasLeft = true;
               } else {
