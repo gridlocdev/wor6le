@@ -1,9 +1,6 @@
 # Stage 1: Build Flutter web app
 FROM debian:bookworm-slim AS build
 
-# Define build argument for base href (default to relative paths)
-ARG BASE_HREF=/games/wor6le/
-
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y curl git unzip xz-utils && \
@@ -44,8 +41,9 @@ USER flutteruser
 # Get packages
 RUN flutter pub get
 
-# Build Flutter web app with configurable base href
-RUN flutter build web --release --base-href ${BASE_HREF}
+# Build Flutter web app. Path-agnostic: web/index.html sets <base href="./">
+# so the output works from any subdirectory without a build-time --base-href.
+RUN flutter build web --release
 
 # Stage 2: Serve with busybox httpd
 FROM busybox:latest AS serve
